@@ -3,11 +3,18 @@
 Created on Tue Sep 15 01:04:55 2020
 
 @author: Hammad
+
+Scientific units used are as follows,
+Coordinates (Lat, Lon) : Decimal Degrees (DD)
+Timestamp : Python Datetime
+Barometric pressure : mb
+Wind Intensity: Knots
 """
 
 import xmltodict
 import requests
 from datetime import datetime
+import dateutil.parser
 from pytz import timezone
 import zipfile
 import io
@@ -15,7 +22,7 @@ import io
 # this link can be reused to download the most recent data
 static_link = 'https://www.nhc.noaa.gov/gis/kml/nhc_active.kml'
 # common timezones for parsing with dateutil. offset by seconds
-timezone_info = {
+timezones = {
     "ADT": 4 * 3600,
     "AST": 3 * 3600,
     "CDT": -5 * 3600,
@@ -73,49 +80,60 @@ def past_track(link):
                 # add to results
                 kml['results'].append({
                     'time' : time,
-                    'wind' : entry['intensity'],
-                    'lat' : entry['lat'],
-                    'lon' : entry['lon'],
-                    'pressure' : entry['minSeaLevelPres']
+                    'wind' : float(entry['intensity']),
+                    'lat' : float(entry['lat']),
+                    'lon' : float(entry['lon']),
+                    'pressure' : float(entry['minSeaLevelPres'])
                 })
                 print(kml['results'][-1])
 
     return kml
 
+if __name__ == "__main__" :
+    # create data structure as dictionary
+    request = requests.get(static_link)
+    data = xmltodict.parse(request.text)
 
-# create data structure as dictionary
-request = requests.get(static_link)
-data = xmltodict.parse(request.text)
+    # parse in storms
+    for folder in data['kml']['Document']['Folder'] :
+        # the id's that start with 'at' are the storms we are interested in
+        # others can include 'wsp' for wind speed probabilities
+        if folder['@id'][:2] == 'at' :
+            # some storms don't have any data because they are so weak
+            if not 'ExtendedData' in folder.keys() :
+                continue
 
-# parse in storms
-for folder in data['kml']['Document']['Folder'] :
-    # the id's that start with 'at' are the storms we are interested in
-    # others can include 'wsp' for wind speed probabilities
-    if folder['@id'][:2] == 'at' :
-        # some storms don't have any data because they are so weak
-        if not 'ExtendedData' in folder.keys() :
-            continue
+            # storm data structure
+            storm = {
+                'metadata' : folder,
+                'entries' : []
+            }
+            entry = {}
+            for attribute in folder['ExtendedData'][1] :
+                if attribute == 'tc:atcfID' : # NHC Storm ID
+                    storm['id'] = folder['ExtendedData'][1][attribute]
+                elif attribute == 'tc:name' : # Human readable name
+                    print(folder['ExtendedData'][1][attribute])
+                elif attribute == 'tc:centerLat' : # Latitude
+                    entry['lat'] = float(folder['ExtendedData'][1][attribute])
+                elif attribute == 'tc:centerLon' : # Longitude
+                    entry['lon'] = float(folder['ExtendedData'][1][attribute])
+                elif attribute == 'tc:dateTime' : # Timestamp
+                    entry['time'] = dateutil.parser.parse(
+                        folder['ExtendedData'][1][attribute],
+                        tzinfos = timezones)
+                elif attribute == 'tc:minimumPressure' : # Barometric pressure
+                    entry['pressure'] = float(folder['ExtendedData'][1]
+                                              [attribute].split(' ')[0])
+                elif attribute == 'tc:maxSustainedWind' : # Wind Intensity
+                    # note that we are converting mph to knots
+                    entry['wind'] = float(folder['ExtendedData'][1][attribute].
+                                          split(' ')[0]) / 1.151
 
-        # storm data structure
-        storm = {
-            'metadata' : folder,
-            'entries' : []
-        }
-        entry = {}
-        for attribute in folder['ExtendedData'][1] :
-            if attribute == 'tc:atcfID' :
-                storm['id'] = folder['ExtendedData'][1][attribute]
-            if attribute == 'tc:name' :
-                print(folder['ExtendedData'][1][attribute])
-            if attribute == 'tc:centerLat' :
-                entry['lat'] = folder['ExtendedData'][1][attribute]
-            if attribute == 'tc:centerLon' :
-                entry['lon'] = folder['ExtendedData'][1][attribute]
-            if attribute == 'tc:centerLat' :
-                entry['lat'] = folder['ExtendedData'][1][attribute]
-        print(storm['id'])
-        # get network link and extract past history
-        for links in folder['NetworkLink'] :
-            if links['@id'] == 'pasttrack' :
-                past_track(links['Link']['href'])
+            print(storm['id'])
+            print(entry)
 
+            # get network link and extract past history
+            for links in folder['NetworkLink'] :
+                if links['@id'] == 'pasttrack' :
+                    past_track(links['Link']['href'])

@@ -14,7 +14,22 @@ import io
 
 # this link can be reused to download the most recent data
 static_link = 'https://www.nhc.noaa.gov/gis/kml/nhc_active.kml'
-
+# common timezones for parsing with dateutil. offset by seconds
+timezone_info = {
+    "ADT": 4 * 3600,
+    "AST": 3 * 3600,
+    "CDT": -5 * 3600,
+    "CST": -6 * 3600,
+    "CT": -6 * 3600,
+    "EDT": -4 * 3600,
+    "EST": -5 * 3600,
+    "ET": -5 * 3600,
+    "GMT": 0 * 3600,
+    "PST": -8 * 3600,
+    "PT": -8 * 3600,
+    "UTC": 0 * 3600,
+    "Z": 0 * 3600,
+}
 
 def past_track(link):
     '''
@@ -81,16 +96,26 @@ for folder in data['kml']['Document']['Folder'] :
         if not 'ExtendedData' in folder.keys() :
             continue
 
+        # storm data structure
         storm = {
-            'metadata' : folder
+            'metadata' : folder,
+            'entries' : []
         }
+        entry = {}
         for attribute in folder['ExtendedData'][1] :
             if attribute == 'tc:atcfID' :
                 storm['id'] = folder['ExtendedData'][1][attribute]
             if attribute == 'tc:name' :
                 print(folder['ExtendedData'][1][attribute])
+            if attribute == 'tc:centerLat' :
+                entry['lat'] = folder['ExtendedData'][1][attribute]
+            if attribute == 'tc:centerLon' :
+                entry['lon'] = folder['ExtendedData'][1][attribute]
+            if attribute == 'tc:centerLat' :
+                entry['lat'] = folder['ExtendedData'][1][attribute]
         print(storm['id'])
         # get network link and extract past history
         for links in folder['NetworkLink'] :
             if links['@id'] == 'pasttrack' :
                 past_track(links['Link']['href'])
+

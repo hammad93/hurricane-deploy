@@ -40,16 +40,30 @@ def past_track(link):
 
     # read the contents of the kml file in the archive
     kml = xmltodict.parse(uncompressed.read(file_name))
+    kml['results'] = []
     for attribute in kml['kml']['Document']['Folder']:
         if attribute['name'] == 'Data':
             for entry in attribute['Placemark']:
-                print(datetime.strptime(entry['atcfdtg'],
+                # parse time information
+                time = datetime.strptime(entry['atcfdtg'],
                                         '%Y%m%d%H').replace(
-                    tzinfo=timezone('UTC')))
-                print(f'Wind: {entry["intensity"]}, '
+                    tzinfo=timezone('UTC'))
+                '''
+                print(f'Time: {time}, '
+                      f'Wind: {entry["intensity"]}, '
                       f'Lat: {entry["lat"]}, '
                       f'Lon: {entry["lon"]}, '
                       f'Pressure: {entry["minSeaLevelPres"]}')
+                '''
+                # add to results
+                kml['results'].append({
+                    'time' : time,
+                    'wind' : entry['intensity'],
+                    'lat' : entry['lat'],
+                    'lon' : entry['lon'],
+                    'pressure' : entry['minSeaLevelPres']
+                })
+                print(kml['results'][-1])
 
     return kml
 

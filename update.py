@@ -46,6 +46,10 @@ def past_track(link):
                 print(datetime.strptime(entry['atcfdtg'],
                                         '%Y%m%d%H').replace(
                     tzinfo=timezone('UTC')))
+                print(f'Wind: {entry["intensity"]}, '
+                      f'Lat: {entry["lat"]}, '
+                      f'Lon: {entry["lon"]}, '
+                      f'Pressure: {entry["minSeaLevelPres"]}')
 
     return kml
 

@@ -93,6 +93,7 @@ if __name__ == "__main__" :
     # create data structure as dictionary
     request = requests.get(static_link)
     data = xmltodict.parse(request.text)
+    results = []
 
     # parse in storms
     for folder in data['kml']['Document']['Folder'] :
@@ -109,6 +110,7 @@ if __name__ == "__main__" :
                 'entries' : []
             }
             entry = {}
+
             for attribute in folder['ExtendedData'][1] :
                 if attribute == 'tc:atcfID' : # NHC Storm ID
                     storm['id'] = folder['ExtendedData'][1][attribute]
@@ -133,7 +135,17 @@ if __name__ == "__main__" :
             print(storm['id'])
             print(entry)
 
+            # add entry to storm
+            storm['entries'].append(entry)
             # get network link and extract past history
             for links in folder['NetworkLink'] :
                 if links['@id'] == 'pasttrack' :
-                    past_track(links['Link']['href'])
+                    kml = past_track(links['Link']['href'])
+                    # add history to entries
+                    storm['entries'].extend(kml['results'])
+
+                    # add history to storm metadata
+                    storm['metadata']['history'] = kml
+
+            # add to results
+            results.append(storm)

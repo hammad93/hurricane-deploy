@@ -4,7 +4,7 @@ learning and deep learning methods
 
 # Quickstart
 
-## Import most recent Atlantic tropic storms
+## Import most recent Atlantic tropical storms
 
 From this NHC resource described here, , we can import the most recent tropical
 storms using the following code.

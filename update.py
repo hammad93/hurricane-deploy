@@ -108,7 +108,11 @@ def nhc() :
     request = requests.get(static_link)
     data = xmltodict.parse(request.text)
     results = []
-
+    
+    # return if no storms
+    if 'Folder' not in data['kml']['Document'].keys() :
+        return
+    
     # parse in storms
     for folder in data['kml']['Document']['Folder']:
         # the id's that start with 'at' are the storms we are interested in

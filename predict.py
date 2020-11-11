@@ -1,4 +1,5 @@
 import googleapiclient.discovery
+from google.api_core.client_options import ClientOptions
 
 def predict_json(project, region, model, instances, version=None):
     """Send json data to a deployed model for prediction.
@@ -25,16 +26,14 @@ def predict_json(project, region, model, instances, version=None):
     service = googleapiclient.discovery.build(
         'ml', 'v1', client_options=client_options)
     name = 'projects/{}/models/{}'.format(project, model)
-
     if version is not None:
         name += '/versions/{}'.format(version)
-
     response = service.projects().predict(
         name=name,
         body={'instances': instances}
     ).execute()
-
     if 'error' in response:
         raise RuntimeError(response['error'])
-
     return response['predictions']
+
+predict_json('cyclone-ai', 'us-central1', 'huraim_test', [[[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]]])

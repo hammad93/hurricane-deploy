@@ -1,3 +1,5 @@
 authentication.json
 .idea/
 .idea*
+credentials.csv
+.DS_Store

@@ -3,3 +3,4 @@ authentication.json
 .idea*
 credentials.csv
 .DS_Store
+report.log

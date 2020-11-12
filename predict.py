@@ -108,7 +108,7 @@ def predict_universal(data = None) :
         # create prescale data structure
         df = pd.DataFrame(storm['entries']).sort_values('time', ascending = False)
         # set reference time
-        reference = df['time'].max().replace(tzinfo = timezone.utc).timestamp()
+        reference = df['time'].max().replace(tzinfo = timezone.utc)
         reference_count = 0
         print(f"Reference time is: {reference}")
         while reference.hour not in [0,6,12,18] : # not a regular timezone
@@ -126,8 +126,8 @@ def predict_universal(data = None) :
         input = np.expand_dims(scaler.transform(input), axis = 0)
 
         # get our prediction
-        prediction = list(predict_json('cyclone-ai', 'universal', 
-                                       input)[0].values())[0]
+        prediction = predict_json('cyclone-ai', 'universal', input.tolist())["predictions"][0]["time_distributed"]
+        print(prediction)
         
         # inverse transform the prediction
         lat = [output[0] for output in scaler.inverse_transform(
@@ -149,6 +149,6 @@ def predict_universal(data = None) :
             }
 
         results.append(output)
-        print(f'Done with {storm["id"]}')
+        print(f'Done with {storm["id"]}, results:\n{output}')
 
     return results

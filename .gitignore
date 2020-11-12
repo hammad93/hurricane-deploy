@@ -4,3 +4,5 @@ authentication.json
 credentials.csv
 .DS_Store
 report.log
+__pycache__
+__pycache__/*

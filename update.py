@@ -168,6 +168,8 @@ def nhc() :
             # add to results
             results.append(storm)
 
+    return results
+
 
 if __name__ == "__main__" :
     nhc()

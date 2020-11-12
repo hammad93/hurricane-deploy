@@ -1,9 +1,11 @@
 import update
 import pickle
+import numpy as np
 import pandas as pd
 import sklearn
 from google.cloud import storage
 from datetime import timedelta
+from datetime import timezone
 import googleapiclient.discovery
 
 def download_file(filename) :
@@ -102,13 +104,21 @@ def predict_universal(data = None) :
     results = []
     for storm in raw :
         print(f'Processing {storm["id"]}. . . ')
+
         # create prescale data structure
-        df = pd.DataFrame(storm['entries'])
-        df.set_index('time')
+        df = pd.DataFrame(storm['entries']).sort_values('time', ascending = False)
+        # set reference time
+        reference = df['time'].max().replace(tzinfo = timezone.utc).timestamp()
+        reference_count = 0
+        print(f"Reference time is: {reference}")
+        while reference.hour not in [0,6,12,18] : # not a regular timezone
+            reference_count += 1
+            reference = df.iloc[reference_count]['time']
+            print(f"Reference time is: {reference}")
         input = df[df['time'].isin(
-            [df['time'].max() - timedelta(hours = delta)
+            [reference - timedelta(hours = delta)
              for delta in [0,24,48,72,96,120]])
-        ].sort_values('time', ascending = False)
+        ].sort_values('time', ascending = False).reindex()
         input = [list(feature_extraction(input.iloc[i + 1], input.iloc[i]).values())
                  for i in range(5)]
 

@@ -12,6 +12,4 @@ COPY requirements.txt /root/
 RUN pip install -r /root/requirements.txt
 
 # Add git repository
-RUN apt update
-RUN apt install git -y
 RUN git clone --single-branch --branch master https://github.com/hammad93/hurricane-deploy.git

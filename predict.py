@@ -101,6 +101,7 @@ def predict_universal(data = None) :
     # generate predictions
     results = []
     for storm in raw :
+        print(f'Processing {storm["id"]}. . . ')
         # create prescale data structure
         df = pd.DataFrame(storm['entries'])
         df.set_index('time')
@@ -138,5 +139,6 @@ def predict_universal(data = None) :
             }
 
         results.append(output)
+        print(f'Done with {storm["id"]}')
 
     return results

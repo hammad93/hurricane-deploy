@@ -24,5 +24,5 @@ RUN apt-get update && apt-get -y install cron
 
 # Entrypoint
 ADD entrypoint.sh /root/entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /root/entrypoint.sh
 ENTRYPOINT /root/entrypoint.sh

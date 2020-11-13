@@ -30,4 +30,4 @@ RUN crontab /root/email-cron
 # Create the log file to be able to run tail
 RUN touch /root/cron.log
 # Run the command on container startup
-CMD cron && tail -f /root/cron.log
+CMD service cron start

@@ -23,6 +23,6 @@ RUN git clone --single-branch --branch master https://github.com/hammad93/hurric
 RUN apt-get update && apt-get -y install cron
 
 # Entrypoint
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x /run.sh /entrypoint.sh
-ENTRYPOINT /entrypoint.sh
+ADD entrypoint.sh /root/entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT /root/entrypoint.sh

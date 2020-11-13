@@ -2,6 +2,7 @@ import pandas as pd
 import logging
 import predict
 import smtplib
+import pprint
 import email.utils
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -54,7 +55,7 @@ BODY_HTML = """<html>
 <head></head>
 <body>
   <h1>Universal Output</h1>
-  <p>""" + predict.predict_universal() """</p>
+  <p>""" + pprint.pformat(predict.predict_universal()) + """</p>
 </body>
 </html>
             """

@@ -55,7 +55,7 @@ BODY_HTML = """<html>
 <head></head>
 <body>
   <h1>Universal Output</h1>
-  <p>""" + pprint.pformat(predict.predict_universal()) + """</p>
+  <pre>""" + pprint.pformat(predict.predict_universal()) + """</pre>
 </body>
 </html>
             """

@@ -157,7 +157,7 @@ def predict_universal(data = None) :
                 'long': lon[index],
                 'max_wind(mph)': wind[index] * 1.15078
             }
-
+        output['id'] = storm['id']
         results.append(output)
         print(f'Done with {storm["id"]}, results:\n{output}')
 

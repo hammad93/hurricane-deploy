@@ -1,1 +1,0 @@
-0 * * * * python /hurricane-deploy/report.py > /root/cron.log

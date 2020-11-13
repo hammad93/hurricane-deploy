@@ -21,13 +21,8 @@ RUN git clone --single-branch --branch master https://github.com/hammad93/hurric
 # Setup cron job
 
 RUN apt-get update && apt-get -y install cron
-# Copy hello-cron file to the cron.d directory
-COPY email-cron /root/email-cron
-# Give execution rights on the cron job
-RUN chmod 0644 /root/email-cron
-# Apply cron job
-RUN crontab /root/email-cron
-# Create the log file to be able to run tail
-RUN touch /root/cron.log
-# Run the command on container startup
-CMD service cron start
+
+# Entrypoint
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /run.sh /entrypoint.sh
+ENTRYPOINT /entrypoint.sh

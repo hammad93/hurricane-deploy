@@ -2,6 +2,7 @@ import update
 import pickle
 import numpy as np
 import pandas as pd
+import logging
 import sklearn
 from google.cloud import storage
 from datetime import timedelta
@@ -107,18 +108,25 @@ def predict_universal(data = None) :
 
         # create prescale data structure
         df = pd.DataFrame(storm['entries']).sort_values('time', ascending = False)
-        # set reference time
+        # set reference time and geometric pattern recognition
         reference = df['time'].max().replace(tzinfo = timezone.utc)
         reference_count = 0
         print(f"Reference time is: {reference}")
-        while reference.hour not in [0,6,12,18] : # not a regular timezone
+        while reference.hour not in [0, 6, 12, 18] : # not a regular timezone
             reference_count += 1
             reference = df.iloc[reference_count]['time']
             print(f"Reference time is: {reference}")
         input = df[df['time'].isin(
             [reference - timedelta(hours = delta)
-             for delta in [0,24,48,72,96,120]])
+             for delta in [0, 24, 48, 72, 96, 120]])
         ].sort_values('time', ascending = False).reindex()
+        # if input is not long enough
+        if (len(input) < 6) :
+            logging.warning(
+                f"{storm['id']}"
+                f" does not have enough data, does not follow the input"
+                f" pattern for the AI, or an unknown error. Skipping.")
+            continue
         input = [list(feature_extraction(input.iloc[i + 1], input.iloc[i]).values())
                  for i in range(5)]
 
@@ -126,15 +134,17 @@ def predict_universal(data = None) :
         input = np.expand_dims(scaler.transform(input), axis = 0)
 
         # get our prediction
-        prediction = predict_json('cyclone-ai', 'universal', input.tolist())["predictions"][0]["time_distributed"]
+        prediction = predict_json(
+            'cyclone-ai', 'universal', input.tolist())[
+            "predictions"][0]["time_distributed"]
         print(prediction)
         
         # inverse transform the prediction
         lat = [output[0] for output in scaler.inverse_transform(
             [[lat[0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for lat in
              prediction])]
-        long = [output[1] for output in scaler.inverse_transform(
-            [[0, long[0], 0, 0, 0, 0, 0, 0, 0, 0, 0] for long in
+        lon = [output[1] for output in scaler.inverse_transform(
+            [[0, lon[0], 0, 0, 0, 0, 0, 0, 0, 0, 0] for lon in
              prediction])]
         wind = [output[2] for output in scaler.inverse_transform(
             [[0, 0, wind[0], 0, 0, 0, 0, 0, 0, 0, 0] for wind in
@@ -144,8 +154,8 @@ def predict_universal(data = None) :
         for index, value in enumerate([24, 48, 72, 96, 120]):
             output[value] = {
                 'lat': lat[index],
-                'long': long[index],
-                'max_wind': wind[index] * 1.15078
+                'long': lon[index],
+                'max_wind(mph)': wind[index] * 1.15078
             }
 
         results.append(output)

@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import predict
 import smtplib
 import email.utils
 from email.mime.multipart import MIMEMultipart
@@ -52,11 +53,8 @@ BODY_TEXT = ("Amazon SES Test\r\n"
 BODY_HTML = """<html>
 <head></head>
 <body>
-  <h1>Amazon SES SMTP Email Test</h1>
-  <p>This email was sent with Amazon SES using the
-    <a href='https://www.python.org/'>Python</a>
-    <a href='https://docs.python.org/3/library/smtplib.html'>
-    smtplib</a> library.</p>
+  <h1>Universal Output</h1>
+  <p>""" + predict.predict_universal() """</p>
 </body>
 </html>
             """

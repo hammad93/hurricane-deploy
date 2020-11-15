@@ -1,8 +1,9 @@
 import pandas as pd
 import logging
 import predict
+import update
 import smtplib
-import pprint
+import datetime
 import email.utils
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -51,11 +52,50 @@ BODY_TEXT = ("Amazon SES Test\r\n"
             )
 
 # The HTML body of the email.
+data = update.nhc()
 BODY_HTML = """<html>
 <head></head>
 <body>
-  <h1>Universal Output</h1>
-  <pre>""" + pprint.pformat(predict.predict_universal()) + """</pre>
+  <h1>Universal Output</h1>"""
+for storm in data :
+    # get the prediction for this storm
+    prediction = predict.predict_universal([storm])[0]
+
+    # add to HTML
+    html = f"""
+    <h2>{storm['storm']}({storm['metadata']['ExtendedData']['tc:name']})</h2>
+    """
+    # print the informative error
+    if 'error' in prediction.keys() :
+        html += f"""
+      <pre>
+       {prediction['error']}
+      </pre
+        """
+        continue
+
+    # put the predictions
+    html += """
+      <table>
+        <tr>
+          <th><b>Time</b></th>
+          <th><b>Wind (mph)</b></th>
+          <th><b>Coordinates (Decimal Degrees)</b></th>
+        <tr>
+    """
+    for value in prediction :
+        # datetime object keys are predictions
+        if isinstance(value, datetime.datetime) :
+            html += f"""
+        <tr>
+          <th><b>{value.isoformat()}</b></th>
+          <th><b>{value['max_wind(mph)']:.2f}</b></th>
+          <th><b>{value['lat']:.2f}, {value['lon']:.2f}</b></th>
+        <tr>            
+            """
+    html += "</table>"
+    BODY_HTML += html
+BODY_HTML += """
 </body>
 </html>
             """

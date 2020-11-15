@@ -108,6 +108,7 @@ def predict_universal(data = None) :
 
         # create prescale data structure
         df = pd.DataFrame(storm['entries']).sort_values('time', ascending = False)
+
         # set reference time and geometric pattern recognition
         reference = df['time'].max().replace(tzinfo = timezone.utc)
         reference_count = 0
@@ -120,13 +121,17 @@ def predict_universal(data = None) :
             [reference - timedelta(hours = delta)
              for delta in [0, 24, 48, 72, 96, 120]])
         ].sort_values('time', ascending = False).reindex()
-        # if input is not long enough
+
+        # flag for if input is not long enough
         if (len(input) < 6) :
             logging.warning(
                 f"{storm['id']}"
                 f" does not have enough data, does not follow the input"
                 f" pattern for the AI, or an unknown error. Skipping.")
+            results.append({'error': f'{storm[id]} did not have enough records'})
             continue
+
+        # generate input
         input = [list(feature_extraction(input.iloc[i + 1], input.iloc[i]).values())
                  for i in range(5)]
 
@@ -152,7 +157,81 @@ def predict_universal(data = None) :
 
         output = dict()
         for index, value in enumerate([24, 48, 72, 96, 120]):
-            output[value] = {
+            output[reference + timedelta(hours = value)] = {
+                'lat': lat[index],
+                'lon': lon[index],
+                'max_wind(mph)': wind[index] * 1.15078
+            }
+        output['id'] = storm['id']
+        results.append(output)
+        print(f'Done with {storm["id"]}, results:\n{output}')
+
+    return results
+
+def predict_singular(data = None) :
+    # get the update
+    if data :
+        raw = data
+    else :
+        raw = update.nhc()
+
+    # read in the scaler
+    download_file('model_artifacts/universal/feature_scaler.pkl')
+    with open('/root/feature_scaler.pkl', 'rb') as f :
+        scaler = pickle.load(f)
+
+    # generate predictions
+    results = []
+    for storm in raw:
+        print(f'Processing {storm["id"]}. . . ')
+
+        # create prescale data structure
+        df = pd.DataFrame(storm['entries']).sort_values('time', ascending=False)
+        # set reference time and geometric pattern recognition
+        reference = df['time'].max().replace(tzinfo=timezone.utc)
+        reference_count = 0
+        print(f"Reference time is: {reference}")
+        while reference.hour not in [0, 6, 12, 18]:  # not a regular timezone
+            reference_count += 1
+            reference = df.iloc[reference_count]['time']
+            print(f"Reference time is: {reference}")
+        input = df[df['time'].isin(
+            [reference - timedelta(hours=delta)
+             for delta in [0, 24, 48, 72, 96, 120]])
+        ].sort_values('time', ascending=False).reindex()
+        # if input is not long enough
+        if (len(input) < 6):
+            logging.warning(
+                f"{storm['id']}"
+                f" does not have enough data, does not follow the input"
+                f" pattern for the AI, or an unknown error. Skipping.")
+            continue
+        input = [list(feature_extraction(input.iloc[i + 1], input.iloc[i]).values())
+                 for i in range(5)]
+
+        # scale our input
+        input = np.expand_dims(scaler.transform(input), axis=0)
+
+        # get our prediction
+        prediction = predict_json(
+            'cyclone-ai', 'universal', input.tolist())[
+            "predictions"][0]["time_distributed"]
+        print(prediction)
+
+        # inverse transform the prediction
+        lat = [output[0] for output in scaler.inverse_transform(
+            [[lat[0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for lat in
+             prediction])]
+        lon = [output[1] for output in scaler.inverse_transform(
+            [[0, lon[0], 0, 0, 0, 0, 0, 0, 0, 0, 0] for lon in
+             prediction])]
+        wind = [output[2] for output in scaler.inverse_transform(
+            [[0, 0, wind[0], 0, 0, 0, 0, 0, 0, 0, 0] for wind in
+             prediction])]
+
+        output = dict()
+        for index, value in enumerate([24, 48, 72, 96, 120]):
+            output[reference + timedelta(hours=value)] = {
                 'lat': lat[index],
                 'long': lon[index],
                 'max_wind(mph)': wind[index] * 1.15078

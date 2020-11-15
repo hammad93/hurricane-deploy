@@ -128,7 +128,7 @@ def predict_universal(data = None) :
                 f"{storm['id']}"
                 f" does not have enough data, does not follow the input"
                 f" pattern for the AI, or an unknown error. Skipping.")
-            results.append({'error': f'{storm[id]} did not have enough records'})
+            results.append({'error': f'{storm["id"]} did not have enough records'})
             continue
 
         # generate input

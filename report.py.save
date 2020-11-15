@@ -1,3 +1,4 @@
+ls
 import pandas as pd
 import logging
 import predict
@@ -13,6 +14,7 @@ logging.basicConfig(filename='report.log', level=logging.DEBUG)
 
 # Gather credentials
 credentials = pd.read_csv('/root/credentials.csv')
+print(credentials)
 logging.warning('Read in credentials for SMTP server')
 
 # Replace sender@example.com with your "From" address.
@@ -59,10 +61,10 @@ BODY_HTML = """<html>
 for storm in data :
     # get the prediction for this storm
     prediction = predict.predict_universal([storm])[0]
-    print(prediction)
+
     # add to HTML
     html = f"""
-    <h2>{storm['id']}({storm['name']})</h2>
+    <h2>{storm['id']}({storm['metadata']['ExtendedData']['tc:name']})</h2>
     """
     # print the informative error
     if 'error' in prediction.keys() :
@@ -88,8 +90,8 @@ for storm in data :
             html += f"""
         <tr>
           <th><b>{value.isoformat()}</b></th>
-          <th><b>{prediction[value]['max_wind(mph)']:.2f}</b></th>
-          <th><b>{prediction[value]['lat']:.2f}, {prediction[value]['lon']:.2f}</b></th>
+          <th><b>{value['max_wind(mph)']:.2f}</b></th>
+          <th><b>{value['lat']:.2f}, {value['lon']:.2f}</b></th>
         <tr>            
             """
     html += "</table>"

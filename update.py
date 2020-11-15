@@ -133,6 +133,7 @@ def nhc() :
                 if attribute == 'tc:atcfID':  # NHC Storm ID
                     storm['id'] = folder['ExtendedData'][1][attribute]
                 elif attribute == 'tc:name':  # Human readable name
+                    storm['name'] = folder['ExtendedData'][1][attribute]
                     print(folder['ExtendedData'][1][attribute])
                 elif attribute == 'tc:centerLat':  # Latitude
                     entry['lat'] = float(folder['ExtendedData'][1][attribute])

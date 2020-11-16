@@ -62,7 +62,7 @@ for storm in data :
     print(prediction)
     # add to HTML
     html = f"""
-    <h2>{storm['id']}({storm['name']})</h2>
+    <h2>{storm['id']} ({storm['name']})</h2>
     """
     # print the informative error
     if 'error' in prediction.keys() :
@@ -71,7 +71,6 @@ for storm in data :
        {prediction['error']}
       </pre>
         """
-        continue
 
     else :
         # put the predictions
@@ -88,9 +87,9 @@ for storm in data :
             if isinstance(value, datetime.datetime) :
                 html += f"""
             <tr>
-              <th><b>{value.isoformat()}</b></th>
-              <th><b>{prediction[value]['max_wind(mph)']:.2f}</b></th>
-              <th><b>{prediction[value]['lat']:.2f}, {prediction[value]['lon']:.2f}</b></th>
+              <th>{value.isoformat()}</th>
+              <th>{prediction[value]['max_wind(mph)']:.2f}</th>
+              <th>{prediction[value]['lat']:.2f}, {prediction[value]['lon']:.2f}</th>
             <tr>            
                 """
         html += "</table>"

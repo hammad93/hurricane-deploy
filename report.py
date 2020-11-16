@@ -69,30 +69,31 @@ for storm in data :
         html += f"""
       <pre>
        {prediction['error']}
-      </pre
+      </pre>
         """
         continue
 
-    # put the predictions
-    html += """
-      <table>
-        <tr>
-          <th><b>Time</b></th>
-          <th><b>Wind (mph)</b></th>
-          <th><b>Coordinates (Decimal Degrees)</b></th>
-        <tr>
-    """
-    for value in prediction :
-        # datetime object keys are predictions
-        if isinstance(value, datetime.datetime) :
-            html += f"""
-        <tr>
-          <th><b>{value.isoformat()}</b></th>
-          <th><b>{prediction[value]['max_wind(mph)']:.2f}</b></th>
-          <th><b>{prediction[value]['lat']:.2f}, {prediction[value]['lon']:.2f}</b></th>
-        <tr>            
-            """
-    html += "</table>"
+    else :
+        # put the predictions
+        html += """
+          <table>
+            <tr>
+              <th><b>Time</b></th>
+              <th><b>Wind (mph)</b></th>
+              <th><b>Coordinates (Decimal Degrees)</b></th>
+            <tr>
+        """
+        for value in prediction :
+            # datetime object keys are predictions
+            if isinstance(value, datetime.datetime) :
+                html += f"""
+            <tr>
+              <th><b>{value.isoformat()}</b></th>
+              <th><b>{prediction[value]['max_wind(mph)']:.2f}</b></th>
+              <th><b>{prediction[value]['lat']:.2f}, {prediction[value]['lon']:.2f}</b></th>
+            <tr>            
+                """
+        html += "</table>"
     BODY_HTML += html
 BODY_HTML += """
 </body>

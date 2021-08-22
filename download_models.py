@@ -43,7 +43,7 @@ def download_model(dir) :
     print(f'Downloading {dir_name} variables . . .', end='')
     os.mkdir(f'/root/{dir_name}/variables')
     for var in bucket.list_blobs(prefix=dir + '/variables') :
-        filename = blob.name.split('/')[-1]
+        filename = var.name.split('/')[-1]
         var.download_to_filename(f'/root/{dir_name}/variables/{filename}')
     print('Done!')
 

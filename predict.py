@@ -3,7 +3,8 @@ import pickle
 import numpy as np
 import pandas as pd
 import logging
-import sklearn
+import requests
+import json
 from google.cloud import storage
 from datetime import timedelta
 from datetime import timezone
@@ -70,6 +71,7 @@ def predict_json(project, model, instances, version=None):
         Mapping[str: any]: dictionary of prediction results defined by the
             model.
     """
+    '''
     # Create the ML Engine service object.
     # To authenticate set the environment variable
     # GOOGLE_APPLICATION_CREDENTIALS=<path_to_service_account_file>
@@ -88,6 +90,18 @@ def predict_json(project, model, instances, version=None):
         raise RuntimeError(response['error'])
 
     return response
+    '''
+    # make request to hurricane ai
+    headers = {"content-type": "application/json"}
+    data = json.dumps({"instances" : instances})
+    json_response = requests.post(f'http://localhost:9000/v1/models/{model}:predict',
+                  data = data,
+                  headers = headers)
+    print(json_response.text)
+
+    # return results
+    return json.loads(json_response.text)["predictions"]
+
 
 def predict_universal(data = None) :
     # get the update

@@ -35,16 +35,17 @@ def download_model(dir) :
     blob = bucket.blob(filename)
     dir_name = dir.split('/')[-1]
     print(f'Downloading {dir_name} . . .', end='')
-    os.mkdir(f'/root/{dir_name}')
-    blob.download_to_filename(f'/root/{dir_name}/{filename.split("/")[-1]}')
+    dir_save = f'/root/forecast/1'
+    os.mkdir(dir_save)
+    blob.download_to_filename(f'{dir_save}/{filename.split("/")[-1]}')
     print('Done!')
 
     # download variables
     print(f'Downloading {dir_name} variables . . .', end='')
-    os.mkdir(f'/root/{dir_name}/variables')
+    os.mkdir(f'{dir_save}/variables')
     for var in bucket.list_blobs(prefix=dir + '/variables') :
         filename = var.name.split('/')[-1]
-        var.download_to_filename(f'/root/{dir_name}/variables/{filename}')
+        var.download_to_filename(f'{dir_save}/variables/{filename}')
     print('Done!')
 
 config = {

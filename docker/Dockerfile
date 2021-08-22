@@ -19,8 +19,13 @@ RUN pip install -r /root/requirements.txt
 RUN git clone --single-branch --branch master https://github.com/hammad93/hurricane-deploy.git
 
 # Setup cron job
-
 RUN apt-get --allow-releaseinfo-change update && apt-get -y install cron
+RUN apt-get install -y gnupg2
+
+# Install Tensorflow Serve
+RUN apt-get update && apt-get install tensorflow-model-server
+RUN apt-get install -y systemd
+COPY hurricane.service /lib/systemd/system/
 
 # Entrypoint
 ADD entrypoint.sh /root/entrypoint.sh

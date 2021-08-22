@@ -30,7 +30,7 @@ def download_model(dir) :
     bucket = storage_client.bucket('cyclone-ai.appspot.com')
 
     # download model
-    filename = dir + 'saved_model.pb'
+    filename = dir + '/saved_model.pb'
     blob = bucket.blob(filename)
     dir_name = dir.split('/')[-1]
     print(f'Downloading {dir_name} . . .', end='')
@@ -45,7 +45,7 @@ def download_model(dir) :
     print('Done!')
 
 config = {
-    'model' : 'model_2020_11_10_07_53'
+    'path' : 'model_2020_11_10_07_53'
 }
 
 download_model(config['model'])

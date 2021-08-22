@@ -35,7 +35,8 @@ def download_model(dir) :
     blob = bucket.blob(filename)
     dir_name = dir.split('/')[-1]
     print(f'Downloading {dir_name} . . .', end='')
-    dir_save = f'/root/forecast/1'
+    dir_save = '/root/forecast/1'
+    os.mkdir('/root/forecast')
     os.mkdir(dir_save)
     blob.download_to_filename(f'{dir_save}/{filename.split("/")[-1]}')
     print('Done!')

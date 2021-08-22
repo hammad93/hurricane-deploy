@@ -7,7 +7,7 @@ declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /contai
 
 # run the tensorflow server
 python /home/bitnami/hurricane-deploy/download_models.py
-nohup tensorflow_model_server --model_base_path=/root/forecast --rest_api_port=9000 --model_name=hurricane &
+nohup tensorflow_model_server --model_base_path=/root/forecast --rest_api_port=9000 --model_name=hurricane 2>&1 &
 
 # Setup a cron schedule
 echo "SHELL=/bin/bash

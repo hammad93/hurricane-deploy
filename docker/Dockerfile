@@ -20,7 +20,7 @@ RUN git clone --single-branch --branch master https://github.com/hammad93/hurric
 
 # Setup cron job
 
-RUN apt-get update && apt-get -y install cron
+RUN apt-get --allow-releaseinfo-change update && apt-get -y install cron
 
 # Entrypoint
 ADD entrypoint.sh /root/entrypoint.sh

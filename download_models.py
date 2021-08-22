@@ -48,4 +48,4 @@ config = {
     'path' : 'model_2020_11_10_07_53'
 }
 
-download_model(config['model'])
+download_model(config['path'])

@@ -154,7 +154,7 @@ def predict_universal(data = None) :
 
         # get our prediction
         prediction = predict_json(
-            'cyclone-ai', 'universal', input.tolist())[
+            'cyclone-ai', 'hurricane', input.tolist())[
             "predictions"][0]["time_distributed"]
         print(prediction)
         

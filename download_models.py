@@ -7,6 +7,7 @@ into the /root/ directory
 '''
 
 from google.cloud import storage
+import os
 
 def download_model(dir) :
     '''
@@ -34,11 +35,13 @@ def download_model(dir) :
     blob = bucket.blob(filename)
     dir_name = dir.split('/')[-1]
     print(f'Downloading {dir_name} . . .', end='')
+    os.mkdir(f'/root/{dir_name}')
     blob.download_to_filename(f'/root/{dir_name}/{filename.split("/")[-1]}')
     print('Done!')
 
     # download variables
     print(f'Downloading {dir_name} variables . . .', end='')
+    os.mkdir(f'/root/{dir_name}/variables')
     for var in bucket.list_blobs(prefix=dir + '/variables') :
         filename = blob.name.split('/')[-1]
         var.download_to_filename(f'/root/{dir_name}/variables/{filename}')

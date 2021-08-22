@@ -6,7 +6,8 @@ echo "Docker container has been started"
 declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /container.env
 
 # run the tensorflow server
-nohup tensorflow_model_server --model_base_path=/root/forecast --rest_api_port=9000 --model_name=hurricane >> /ai.logs &
+python /hurricane-deploy/download_models.py
+nohup tensorflow_model_server --model_base_path=/root/forecast --rest_api_port=9000 --model_name=hurricane &
 
 # Setup a cron schedule
 echo "SHELL=/bin/bash

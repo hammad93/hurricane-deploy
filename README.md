@@ -4,7 +4,8 @@ learning and deep learning methods
 
 # Quickstart
 
-A **authentication.json** is required for authentication based on Google cloud storage and a **credentials.csv** for the SMTP server hosted on AWS.
+  - A **authentication.json** is required for authentication of cloud storage to download the artificial intelligence Tensorflow models.
+  - A **credentials.csv** is required for authentication of the SMTP server to send emails.
 
 1. Navigate to the `docker` directory in this repository
 2. Run the docker command, `sudo docker build --no-cache -t hurricane .` to install the deployment using docker

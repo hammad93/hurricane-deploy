@@ -58,8 +58,14 @@ BODY_HTML = """<html>
   <h1>Universal Output</h1>"""
 for storm in data :
     # get the prediction for this storm
-    prediction = predict.predict_universal([storm])[0]
-    print(prediction)
+    try :
+      prediction = predict.predict_universal([storm])[0]
+      print(prediction)
+    except Exception as error :
+      prediction = {
+        'error' : str(error)
+      }
+    
     # add to HTML
     html = f"""
     <h2>{storm['id']} ({storm['name']})</h2>

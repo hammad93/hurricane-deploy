@@ -22,7 +22,7 @@ SENDERNAME = 'Hurricane AI'
 
 # Replace recipient@example.com with a "To" address. If your account
 # is still in the sandbox, this address must be verified.
-RECIPIENT  = 'hammadus@gmail.com'
+RECIPIENT  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
 
 # Replace smtp_username with your Amazon SES SMTP user name.
 USERNAME_SMTP = credentials.iloc[0,1]
@@ -42,7 +42,7 @@ HOST = "email-smtp.us-west-2.amazonaws.com"
 PORT = 587
 
 # The subject line of the email.
-SUBJECT = 'Amazon SES Test (Python smtplib)'
+SUBJECT = 'HURAIM Hourly Reports'
 
 # The email body for recipients with non-HTML email clients.
 BODY_TEXT = ("Amazon SES Test\r\n"

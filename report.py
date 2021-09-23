@@ -57,7 +57,7 @@ BODY_HTML = """<html>
 <body>
   <h1>Hurricane Artificial Intelligence using Machine Learning Hourly Reports</h1><br>
   This experimental academic weather report was generated using the software available at https://github.com/hammad93/hurricane-deploy <br>
-  <h2>Atlantic Tropical Storms and Hurricanes</h2><br>"""
+  <h2>Atlantic Tropical Storms and Hurricanes</h2>"""
 for storm in data :
     # get the prediction for this storm
     try :
@@ -74,7 +74,7 @@ for storm in data :
     """
 
     # storm metadata
-    html += f"""<h3><br>
+    html += f"""<h3>
     Wind : {round(1.150779 * storm['entries'][-1]['wind'])} mph, {storm['entries'][-1]['wind']} Knots<br>
     Pressure : {storm['entries'][-1]['pressure']} mb<br>
     Location : (lat, lon) ({storm['entries'][-1]['lat']}, {storm['entries'][-1]['lon']}<br>)
@@ -82,7 +82,8 @@ for storm in data :
 
     # print the informative error
     if 'error' in prediction.keys() :
-        html += f"""
+      html += f"""
+      <h3><p style="color:red">Errors in running forecast,</p></h3>
       <pre>
        {prediction['error']}
       </pre>

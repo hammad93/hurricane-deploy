@@ -45,9 +45,9 @@ PORT = 587
 SUBJECT = 'HURAIM Hourly Reports'
 
 # The email body for recipients with non-HTML email clients.
-BODY_TEXT = ("Amazon SES Test\r\n"
-             "This email was sent through the Amazon SES SMTP "
-             "Interface using the Python smtplib package."
+BODY_TEXT = ("HURAIM Hourly Reports\r\n"
+             "This email has an attached HTML document. Please reply "
+             "for troubleshooting."
             )
 
 # The HTML body of the email.

@@ -70,6 +70,14 @@ for storm in data :
     html = f"""
     <h2>{storm['id']} ({storm['name']})</h2>
     """
+
+    # storm metadata
+    html += f"""<h3>
+    Wind : {1.150779 * storm['entries'][-1]['wind']} mph, {storm['entries'][-1]['wind']} Knots
+    Pressure : {storm['entries'][-1]['pressure']} mb
+    Location : (lat, lon) ({storm['entries'][-1]['lat']}, {storm['entries'][-1]['lon']})
+    </h3>"""
+
     # print the informative error
     if 'error' in prediction.keys() :
         html += f"""

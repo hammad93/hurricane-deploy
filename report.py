@@ -75,6 +75,7 @@ for storm in data :
 
     # storm metadata
     html += f"""<h3>
+    As of {str(storm['entries'][-1]['time'])}
     Wind : {round(1.150779 * storm['entries'][-1]['wind'])} mph, {storm['entries'][-1]['wind']} Knots<br>
     Pressure : {storm['entries'][-1]['pressure']} mb<br>
     Location : (lat, lon) ({storm['entries'][-1]['lat']}, {storm['entries'][-1]['lon']}<br>)

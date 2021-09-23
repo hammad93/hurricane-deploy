@@ -55,7 +55,9 @@ data = update.nhc()
 BODY_HTML = """<html>
 <head></head>
 <body>
-  <h1>Universal Output</h1>"""
+  <h1>Hurricane Artificial Intelligence using Machine Learning Hourly Reports</h1><br>
+  This experimental academic weather report was generated using the software available at https://github.com/hammad93/hurricane-deploy <br>
+  <h2>Atlantic Tropical Storms and Hurricanes</h2><br>"""
 for storm in data :
     # get the prediction for this storm
     try :
@@ -72,10 +74,10 @@ for storm in data :
     """
 
     # storm metadata
-    html += f"""<h3>
-    Wind : {1.150779 * storm['entries'][-1]['wind']} mph, {storm['entries'][-1]['wind']} Knots
-    Pressure : {storm['entries'][-1]['pressure']} mb
-    Location : (lat, lon) ({storm['entries'][-1]['lat']}, {storm['entries'][-1]['lon']})
+    html += f"""<h3><br>
+    Wind : {round(1.150779 * storm['entries'][-1]['wind'])} mph, {storm['entries'][-1]['wind']} Knots<br>
+    Pressure : {storm['entries'][-1]['pressure']} mb<br>
+    Location : (lat, lon) ({storm['entries'][-1]['lat']}, {storm['entries'][-1]['lon']}<br>)
     </h3>"""
 
     # print the informative error

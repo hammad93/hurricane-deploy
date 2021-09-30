@@ -154,7 +154,6 @@ def predict_universal(data = None) :
 
         # get our prediction
         prediction_json = predict_json('cyclone-ai', 'hurricane', input.tolist())
-        print(f'line 157: {prediction_json}')
         prediction = prediction_json[0]
         
         # inverse transform the prediction

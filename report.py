@@ -64,8 +64,10 @@ for storm in data :
       prediction = predict.predict_universal([storm])[0]
       print(prediction)
     except Exception as error :
+      trace = logging.exception("prediction error")
+      print(trace)
       prediction = {
-        'error' : str(error)
+        'error' : f'{error}\n{trace}'
       }
     
     # add to HTML

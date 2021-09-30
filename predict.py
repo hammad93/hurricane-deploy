@@ -169,7 +169,7 @@ def predict_universal(data = None) :
              prediction])]
 
         output = dict()
-        for index, value in enumerate([24, 48, 72, 96, 120]):
+        for index, value in enumerate([12, 18, 24, 30, 36]):
             output[reference + timedelta(hours = value)] = {
                 'lat': lat[index],
                 'lon': lon[index],

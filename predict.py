@@ -133,7 +133,7 @@ def predict_universal(data = None) :
             print(f"Reference time is: {reference}")
         input = df[df['time'].isin(
             [reference - timedelta(hours = delta)
-             for delta in [0, 24, 48, 72, 96, 120]])
+             for delta in [0, 6, 12, 18, 24, 30]])
         ].sort_values('time', ascending = False).reindex()
 
         # flag for if input is not long enough

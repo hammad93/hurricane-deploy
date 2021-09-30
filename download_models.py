@@ -50,7 +50,7 @@ def download_model(dir) :
     print('Done!')
 
 config = {
-    'path' : 'model_2020_11_10_07_53'
+    'path' : 'model_2021_09_23_03_27'
 }
 
 download_model(config['path'])

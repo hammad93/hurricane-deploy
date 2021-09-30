@@ -153,10 +153,9 @@ def predict_universal(data = None) :
         input = np.expand_dims(scaler.transform(input), axis = 0)
 
         # get our prediction
-        prediction = predict_json(
-            'cyclone-ai', 'hurricane', input.tolist())[
-            "predictions"][0]["time_distributed"]
-        print(prediction)
+        prediction_json = predict_json('cyclone-ai', 'hurricane', input.tolist())
+        print(f'line 157: {prediction_json}')
+        prediction = prediction_json[0]
         
         # inverse transform the prediction
         lat = [output[0] for output in scaler.inverse_transform(

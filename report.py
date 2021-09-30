@@ -60,6 +60,7 @@ BODY_HTML = """<html>
   <h2>Atlantic Tropical Storms and Hurricanes</h2>"""
 for storm in data :
     # get the prediction for this storm
+    '''
     try :
       prediction = predict.predict_universal([storm])[0]
       print(prediction)
@@ -69,7 +70,8 @@ for storm in data :
       prediction = {
         'error' : f'{error}\n{trace}'
       }
-    
+    '''
+    prediction = predict.predict_universal([storm])[0]
     # add to HTML
     html = f"""
     <h2>{storm['id']} ({storm['name']})</h2>

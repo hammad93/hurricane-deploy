@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Sep 15 01:04:55 2020
-
-@author: Hammad
-
 Scientific units used are as follows,
 Coordinates (Lat, Lon) : Decimal Degrees (DD)
 Timestamp : Python Datetime
@@ -18,6 +14,8 @@ import dateutil.parser
 from pytz import timezone
 import zipfile
 import io
+from bs4 import BeautifulSoup
+import pandas as pd
 
 def past_track(link):
     '''
@@ -171,6 +169,72 @@ def nhc() :
 
     return results
 
+def update_global():
+    '''
+    Provides data based on current global storms
+
+    Returns
+    -------
+    array of dict
+        Each dictionary is in the following form,
+        {
+            "storm" : string
+            "metadata" : dict
+            "entries" : array of dict # The data for the storm in the form,
+                {
+                    'time' : Datetime,
+                    'wind' : Knots,
+                    'lat' : Decimal Degrees,
+                    'lon' : Decimal Degrees,
+                    'pressure' : Barometric pressure (mb)
+                }
+        }
+    '''
+    config = {
+        'url' : 'http://rammb-data.cira.colostate.edu/tc_realtime/',
+        'ir_img_url' : 'http://rammb-data.cira.colostate.edu/tc_realtime/archive.asp?product=4kmirimg&storm_identifier=',
+        'base_url' :  'http://rammb-data.cira.colostate.edu'
+    }
+    page = requests.get(config['url'])
+    soup = BeautifulSoup(page.text, 'html.parser')
+    data = soup.findAll('div',attrs={'class':'basin_storms'})
+    storms = []
+    for div in data:
+        links = div.findAll('a')
+        for a in links:
+            storm = {
+                'id' : a.text[:8],
+                'url' : config['url'] + a['href'],
+                'img_url' : config['ir_img_url'] + a.text[:8].lower(),
+            }
+            print(f'[id]: {storm["id"]}')
+            print(f'[url]: {storm["url"]}')
+            print(f'[img_url]: {storm["img_url"]}')
+            
+            # get dataframe from url
+            current_page = requests.get(storm['url'])
+            current_soup = BeautifulSoup(current_page.text, 'html.parser')
+            tables = current_soup.findAll('table')
+            
+            # we manually input the table names because they're the same
+            # for every storm
+            has_forecast = len(tables) > 1
+            storm['data'] = {
+                'forecast_track' : pd.read_html(str(tables[0]))[0] if has_forecast else None,
+                'track_history' : pd.read_html(str(tables[1]))[0] if has_forecast else pd.read_html(str(tables[0]))[0]
+            }
+            print(f'[track_history] : {storm["data"]["track_history"]}')
+            print(f'[forecast_track] : {storm["data"]["forecast_track"]}')
+            
+            # begin getting img url links
+            current_page = requests.get(storm['img_url'])
+            current_soup = BeautifulSoup(current_page.text, 'html.parser')
+            img_urls = [config['base_url'] + img_href['href'] for img_href in current_soup.findAll('table')[0].findAll('a')]
+            storm['img_urls'] = img_urls
+            print(f'[1st img_url]: {storm["img_urls"][0]}')
+            storms.append(storm)
+    
+    return storms
 
 if __name__ == "__main__" :
-    nhc()
+    update_global()

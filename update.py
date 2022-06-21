@@ -178,16 +178,11 @@ def update_global():
     array of dict
         Each dictionary is in the following form,
         {
-            "storm" : string
-            "metadata" : dict
-            "entries" : array of dict # The data for the storm in the form,
-                {
-                    'time' : Datetime,
-                    'wind' : Knots,
-                    'lat' : Decimal Degrees,
-                    'lon' : Decimal Degrees,
-                    'pressure' : Barometric pressure (mb)
-                }
+            "id" : string,
+            "url" : string,
+            "img_url" : string,
+            "data" : dict,
+            "img_urls" : list
         }
     '''
     config = {
@@ -220,8 +215,14 @@ def update_global():
             # for every storm
             has_forecast = len(tables) > 1
             storm['data'] = {
-                'forecast_track' : pd.read_html(str(tables[0]))[0] if has_forecast else None,
-                'track_history' : pd.read_html(str(tables[1]))[0] if has_forecast else pd.read_html(str(tables[0]))[0]
+                'forecast_track' : pd.read_html(
+                  str(tables[0]),
+                  header = 0)[0].to_dict() if has_forecast else None,
+                'track_history' : pd.read_html(
+                  str(tables[1]),
+                  header = 0)[0].to_dict() if has_forecast else pd.read_html(
+                    str(tables[0]),
+                    heder = 0)[0]
             }
             print(f'[track_history] : {storm["data"]["track_history"]}')
             print(f'[forecast_track] : {storm["data"]["forecast_track"]}')

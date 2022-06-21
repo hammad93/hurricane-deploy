@@ -179,10 +179,8 @@ def update_global():
         Each dictionary is in the following form,
         {
             "id" : string,
-            "url" : string,
-            "img_url" : string,
-            "data" : dict,
-            "img_urls" : list
+            "urls" : dict,
+            "data" : dict
         }
     '''
     config = {
@@ -199,15 +197,17 @@ def update_global():
         for a in links:
             storm = {
                 'id' : a.text[:8],
-                'url' : config['url'] + a['href'],
-                'img_url' : config['ir_img_url'] + a.text[:8].lower(),
+                'urls' : {
+                  'base' : config['url'] + a['href'],
+                  'img_url' : config['ir_img_url'] + a.text[:8].lower() 
+                }
             }
             print(f'[id]: {storm["id"]}')
-            print(f'[url]: {storm["url"]}')
-            print(f'[img_url]: {storm["img_url"]}')
+            print(f'[url]: {storm["urls"]["base"]}')
+            print(f'[img_url]: {storm["urls"]["img_url"]}')
             
             # get dataframe from url
-            current_page = requests.get(storm['url'])
+            current_page = requests.get(storm['urls']['base'])
             current_soup = BeautifulSoup(current_page.text, 'html.parser')
             tables = current_soup.findAll('table')
             
@@ -228,11 +228,11 @@ def update_global():
             print(f'[forecast_track] : {storm["data"]["forecast_track"]}')
             
             # begin getting img url links
-            current_page = requests.get(storm['img_url'])
+            current_page = requests.get(storm['urls']['img_url'])
             current_soup = BeautifulSoup(current_page.text, 'html.parser')
             img_urls = [config['base_url'] + img_href['href'] for img_href in current_soup.findAll('table')[0].findAll('a')]
-            storm['img_urls'] = img_urls
-            print(f'[1st img_url]: {storm["img_urls"][0]}')
+            storm['urls']['img_urls'] = img_urls
+            print(f'[1st img_url]: {storm["urls"]["img_urls"][0]}')
             storms.append(storm)
     
     return storms

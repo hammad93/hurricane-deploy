@@ -38,7 +38,7 @@ PASSWORD_SMTP = credentials.iloc[0,2]
 # If you're using Amazon SES in an AWS Region other than US West (Oregon),
 # replace email-smtp.us-west-2.amazonaws.com with the Amazon SES SMTP
 # endpoint in the appropriate region.
-HOST = "email-smtp.us-west-2.amazonaws.com"
+HOST = "smtp-relay.gmail.com"
 PORT = 587
 
 # The subject line of the email.

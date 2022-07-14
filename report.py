@@ -7,13 +7,10 @@ import datetime
 import email.utils
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
 
 # Setup logs
 logging.basicConfig(filename='report.log', level=logging.DEBUG)
-
-# Gather credentials
-credentials = pd.read_csv('/root/credentials.csv')
-logging.warning('Read in credentials for SMTP server')
 
 # Replace sender@example.com with your "From" address.
 # This address must be verified.
@@ -25,10 +22,10 @@ SENDERNAME = 'Hurricane AI'
 RECIPIENT  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
 
 # Replace smtp_username with your Amazon SES SMTP user name.
-USERNAME_SMTP = credentials.iloc[0,1]
+USERNAME_SMTP = os.environ['SMTP_USER']
 
 # Replace smtp_password with your Amazon SES SMTP password.
-PASSWORD_SMTP = credentials.iloc[0,2]
+PASSWORD_SMTP = os.environ['SMTP_PASS']
 
 # (Optional) the name of a configuration set to use for this message.
 # If you comment out this line, you also need to remove or comment out

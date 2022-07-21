@@ -21,22 +21,19 @@ SENDERNAME = 'Hurricane AI'
 # is still in the sandbox, this address must be verified.
 RECIPIENT  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
 
-# Replace smtp_username with your Amazon SES SMTP user name.
-USERNAME_SMTP = os.environ['SMTP_USER']
-
-# Replace smtp_password with your Amazon SES SMTP password.
-PASSWORD_SMTP = os.environ['SMTP_PASS']
+# SMTP Credentials
+credentials_df = pd.read_csv('/root/credentials.csv')
+credentials = credentials_df.iloc[0]
+USERNAME_SMTP = credentials['smtp_user']
+PASSWORD_SMTP = credentials['smtp_pass']
 
 # (Optional) the name of a configuration set to use for this message.
 # If you comment out this line, you also need to remove or comment out
 # the "X-SES-CONFIGURATION-SET:" header below.
 # CONFIGURATION_SET = "ConfigSet"
 
-# If you're using Amazon SES in an AWS Region other than US West (Oregon),
-# replace email-smtp.us-west-2.amazonaws.com with the Amazon SES SMTP
-# endpoint in the appropriate region.
-HOST = "smtp-relay.gmail.com"
-PORT = 587
+HOST = credentials['host']
+PORT = credentials['port']
 
 # The subject line of the email.
 SUBJECT = 'HURAIM Hourly Reports'

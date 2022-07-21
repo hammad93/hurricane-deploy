@@ -33,7 +33,7 @@ PASSWORD_SMTP = credentials['smtp_pass']
 # CONFIGURATION_SET = "ConfigSet"
 
 HOST = credentials['host']
-PORT = credentials['port']
+PORT = int(credentials['port'])
 
 # The subject line of the email.
 SUBJECT = 'HURAIM Hourly Reports'

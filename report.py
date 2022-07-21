@@ -50,7 +50,9 @@ BODY_HTML = """<html>
 <head></head>
 <body>
   <h1>Hurricane Artificial Intelligence using Machine Learning Hourly Reports</h1><br>
-  This experimental academic weather report was generated using the software available at https://github.com/hammad93/hurricane-deploy <br>
+  This experimental academic weather report was generated using the software available at <br>
+  https://github.com/apatel726/HurricaneDissertation <br>
+  https://github.com/hammad93/hurricane-deploy <br>
   <h2>Atlantic Tropical Storms and Hurricanes</h2>"""
 for storm in data :
     # get the prediction for this storm

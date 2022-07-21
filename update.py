@@ -16,6 +16,7 @@ import zipfile
 import io
 from bs4 import BeautifulSoup
 import pandas as pd
+import hashlib
 
 def past_track(link):
     '''
@@ -236,6 +237,13 @@ def update_global():
             storms.append(storm)
     
     return storms
+
+def data_to_hash(df) :
+    '''
+    Takes in a Pandas DataFrame and creates a MD5 hash
+    in order to quickly compare if we have the same data
+    '''
+    return hashlib.md5(str(df).encode()).hexdigest()
 
 if __name__ == "__main__" :
     update_global()

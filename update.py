@@ -110,7 +110,7 @@ def nhc() :
     
     # return if no storms
     if 'Folder' not in data['kml']['Document'].keys() :
-        return
+        return results
     
     # parse in storms
     for folder in data['kml']['Document']['Folder']:

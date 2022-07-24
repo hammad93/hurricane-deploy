@@ -139,4 +139,4 @@ for RECIPIENT in RECIPIENTS.split(',') :
   except Exception as e:
     print ("Error: ", e)
   else:
-    print ("Email sent!")
+    print (f"Email sent to {RECIPIENT}")

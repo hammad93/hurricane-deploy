@@ -12,14 +12,10 @@ import os
 # Setup logs
 logging.basicConfig(filename='report.log', level=logging.DEBUG)
 
-# Replace sender@example.com with your "From" address.
-# This address must be verified.
 SENDER = 'husmani@fluids.ai'
 SENDERNAME = 'Hurricane AI'
 
-# Replace recipient@example.com with a "To" address. If your account
-# is still in the sandbox, this address must be verified.
-RECIPIENT  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
+RECIPIENTS  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
 
 # SMTP Credentials
 credentials_df = pd.read_csv('/root/credentials.csv')
@@ -27,10 +23,6 @@ credentials = credentials_df.iloc[0]
 USERNAME_SMTP = credentials['smtp_user']
 PASSWORD_SMTP = credentials['smtp_pass']
 
-# (Optional) the name of a configuration set to use for this message.
-# If you comment out this line, you also need to remove or comment out
-# the "X-SES-CONFIGURATION-SET:" header below.
-# CONFIGURATION_SET = "ConfigSet"
 
 HOST = credentials['host']
 PORT = int(credentials['port'])
@@ -131,8 +123,10 @@ part2 = MIMEText(BODY_HTML, 'html')
 msg.attach(part1)
 msg.attach(part2)
 
-# Try to send the message.
-try:
+# Try to send the messages to the recipients
+# RECIPIENTS must be comma separated
+for RECIPIENT in RECIPIENTS.split(',') :
+  try:
     server = smtplib.SMTP(HOST, PORT)
     server.ehlo()
     server.starttls()
@@ -141,8 +135,8 @@ try:
     server.login(USERNAME_SMTP, PASSWORD_SMTP)
     server.sendmail(SENDER, RECIPIENT, msg.as_string())
     server.close()
-# Display an error message if something goes wrong.
-except Exception as e:
+  # Display an error message if something goes wrong.
+  except Exception as e:
     print ("Error: ", e)
-else:
+  else:
     print ("Email sent!")

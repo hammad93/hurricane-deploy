@@ -109,7 +109,6 @@ BODY_HTML += """
 msg = MIMEMultipart('alternative')
 msg['Subject'] = SUBJECT
 msg['From'] = email.utils.formataddr((SENDERNAME, SENDER))
-msg['To'] = RECIPIENT
 # Comment or delete the next line if you are not using a configuration set
 # msg.add_header('X-SES-CONFIGURATION-SET',CONFIGURATION_SET)
 
@@ -126,6 +125,7 @@ msg.attach(part2)
 # Try to send the messages to the recipients
 # RECIPIENTS must be comma separated
 for RECIPIENT in RECIPIENTS.split(',') :
+  msg['To'] = RECIPIENT
   try:
     server = smtplib.SMTP(HOST, PORT)
     server.ehlo()

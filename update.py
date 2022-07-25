@@ -17,6 +17,12 @@ import io
 from bs4 import BeautifulSoup
 import pandas as pd
 import hashlib
+import os
+
+def query():
+    '''
+    Utilizes the local database to make a query.
+    '''
 
 def past_track(link):
     '''
@@ -250,6 +256,8 @@ def upload_hash(df) :
     Checks if the data has already been ingested and returns a
     False if it has. It returns the hash if it was successfully uploaded
     '''
+    hash = data_to_hash(df)
+
     return False
 if __name__ == "__main__" :
     update_global()

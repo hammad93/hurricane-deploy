@@ -20,8 +20,8 @@ RECIPIENTS  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
 # SMTP Credentials
 credentials_df = pd.read_csv('/root/credentials.csv')
 credentials = credentials_df.iloc[0]
-USERNAME_SMTP = credentials['smtp_user']
-PASSWORD_SMTP = credentials['smtp_pass']
+USERNAME_SMTP = credentials['user']
+PASSWORD_SMTP = credentials['pass']
 
 
 HOST = credentials['host']

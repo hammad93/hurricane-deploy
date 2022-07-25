@@ -254,7 +254,7 @@ def data_to_hash(df) :
     '''
     return hashlib.md5(str(df).encode()).hexdigest()
 
-def upload_hash(df) :
+def upload_hash(data) :
     '''
     Checks if the data has already been ingested and returns a
     False if it has. It returns the hash if it was successfully uploaded
@@ -263,7 +263,7 @@ def upload_hash(df) :
     ----------
     - https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
     '''
-    hash = data_to_hash(df)
+    hash = data_to_hash(data)
     results = db.query(
         f'select hash from ingest_hash where hash = "{hash}"',
         'hurricane_live')
@@ -274,7 +274,7 @@ def upload_hash(df) :
     table = metadata.tables['ingest_hash']
     stmnt = table.insert().values(
         hash = hash,
-        data = {"results" : [result.to_dict() for result in results]},
+        data = {"results" : result for result in data},
         time = datetime.now().isoformat()
     )
     with engine.connect() as conn :

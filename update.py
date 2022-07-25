@@ -17,7 +17,8 @@ import io
 from bs4 import BeautifulSoup
 import pandas as pd
 import hashlib
-import os
+import db
+import sqlalchemy
 
 def query():
     '''
@@ -255,8 +256,27 @@ def upload_hash(df) :
     '''
     Checks if the data has already been ingested and returns a
     False if it has. It returns the hash if it was successfully uploaded
+
+    References
+    ----------
+    - https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
     '''
     hash = data_to_hash(df)
+    results = db.query(
+        f'select hash from ingest_hash where hash = "{hash}"',
+        'hurricane_live')
+    if len(results) > 0 :
+        return False
+    engine = db.get_engine('hurricane_live')
+    stmnt = sqlalchemy.insert('ingest_hash').values(
+        hash = hash,
+        data = df.to_json(),
+        time = datetime.now().isoformat()
+    )
+    with engine.connect() as conn :
+        result = conn.execute(stmnt)
+        conn.commit()
+    return hash
 
     return False
 if __name__ == "__main__" :

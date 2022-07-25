@@ -7,6 +7,7 @@ Barometric pressure : mb
 Wind Intensity: Knots
 """
 
+from curses import meta
 import xmltodict
 import requests
 from datetime import datetime
@@ -19,7 +20,7 @@ import pandas as pd
 import hashlib
 import db
 import sqlalchemy
-from sqlalchemy.sql import text
+from sqlalchemy import MetaData, Table
 
 def query():
     '''
@@ -269,13 +270,17 @@ def upload_hash(df) :
     if len(results) > 0 :
         return False
     engine = db.get_engine('hurricane_live')
-    stmnt = sqlalchemy.insert(text('ingest_hash')).values(
+    metadata = MetaData(engine).reflect()
+    table = metadata.tables['ingest_hash']
+    stmnt = table.insert().values(
         hash = hash,
         data = df.to_json(),
         time = datetime.now().isoformat()
     )
     with engine.connect() as conn :
+        print(stmnt)
         result = conn.execute(stmnt)
+        print(result)
         conn.commit()
     return hash
     

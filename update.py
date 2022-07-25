@@ -270,11 +270,11 @@ def upload_hash(df) :
     if len(results) > 0 :
         return False
     engine = db.get_engine('hurricane_live')
-    metadata = MetaData(engine).reflect()
+    metadata = MetaData(bind=engine, reflect=True)
     table = metadata.tables['ingest_hash']
     stmnt = table.insert().values(
         hash = hash,
-        data = df.to_json(),
+        data = "{}",
         time = datetime.now().isoformat()
     )
     with engine.connect() as conn :

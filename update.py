@@ -277,7 +277,6 @@ def upload_hash(df) :
         result = conn.execute(stmnt)
         conn.commit()
     return hash
-
-    return False
+    
 if __name__ == "__main__" :
     update_global()

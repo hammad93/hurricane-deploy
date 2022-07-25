@@ -19,6 +19,7 @@ import pandas as pd
 import hashlib
 import db
 import sqlalchemy
+from sqlalchemy.sql import text
 
 def query():
     '''
@@ -230,7 +231,7 @@ def update_global():
                   str(tables[1]),
                   header = 0)[0].to_dict() if has_forecast else pd.read_html(
                     str(tables[0]),
-                    heder = 0)[0]
+                    header = 0)[0]
             }
             print(f'[track_history] : {storm["data"]["track_history"]}')
             print(f'[forecast_track] : {storm["data"]["forecast_track"]}')
@@ -268,7 +269,7 @@ def upload_hash(df) :
     if len(results) > 0 :
         return False
     engine = db.get_engine('hurricane_live')
-    stmnt = sqlalchemy.insert('ingest_hash').values(
+    stmnt = sqlalchemy.insert(text('ingest_hash')).values(
         hash = hash,
         data = df.to_json(),
         time = datetime.now().isoformat()

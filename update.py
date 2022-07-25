@@ -274,7 +274,7 @@ def upload_hash(df) :
     table = metadata.tables['ingest_hash']
     stmnt = table.insert().values(
         hash = hash,
-        data = "{}",
+        data = {"results" : [result.to_dict() for result in results]},
         time = datetime.now().isoformat()
     )
     with engine.connect() as conn :

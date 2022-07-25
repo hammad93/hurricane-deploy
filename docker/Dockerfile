@@ -14,6 +14,9 @@ COPY credentials.csv /root/
 COPY requirements.txt /root/
 RUN pip install -r /root/requirements.txt
 
+# Conda
+RUN conda install -y mysqlclient
+
 # Add git repository
 
 RUN git clone --single-branch --branch master https://github.com/hammad93/hurricane-deploy.git

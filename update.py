@@ -245,5 +245,11 @@ def data_to_hash(df) :
     '''
     return hashlib.md5(str(df).encode()).hexdigest()
 
+def upload_hash(df) :
+    '''
+    Checks if the data has already been ingested and returns a
+    False if it has. It returns the hash if it was successfully uploaded
+    '''
+    return False
 if __name__ == "__main__" :
     update_global()

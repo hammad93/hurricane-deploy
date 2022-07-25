@@ -8,7 +8,7 @@ def connection_string(database):
     '''
     credentials_df = pd.read_csv('/root/credentials.csv')
     config = credentials_df.iloc[1]
-    return f"'mysql://{config['user']}:{config['pass']}@{config['host']}:{config['port']}/{database}"
+    return f"mysql://{config['user']}:{config['pass']}@{config['host']}:{config['port']}/{database}"
 def query(q, database):
     '''
     Query the remote database and return as a dataframe

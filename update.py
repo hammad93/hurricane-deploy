@@ -296,7 +296,7 @@ def global_pipeline() :
     metadata = MetaData(bind=engine, reflect=True)
     table = metadata.tables['hurricane_live']
     # reset live table
-    db.query(q = ('DELETE FROM hurricane_live'), write = True)
+    db.query(q = ('DELETE FROM hurricane_live',), write = True)
     hurricane_rows = []
     for hurricane in data :
         num_entries = max(hurricane['data']['track_history']['Synoptic Time'].keys())

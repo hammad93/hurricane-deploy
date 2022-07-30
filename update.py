@@ -297,6 +297,7 @@ def global_pipeline() :
     data = update_global()
     # check if data is unique
     hash = upload_hash(data)
+    print(f'data hash: {hash}')
     if hash is None :
         return
     # process the data into the live database

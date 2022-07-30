@@ -272,9 +272,9 @@ def upload_hash(data) :
     ----------
     - https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
     '''
-    hash = data_to_hash(data)
+    hashx = data_to_hash(data)
     results = db.query(
-        f'select hash from ingest_hash where hash = "{hash}"',
+        f'select hash from ingest_hash where hash = "{hashx}"',
         'hurricane_live')
     if len(results) > 0 :
         return False
@@ -282,16 +282,16 @@ def upload_hash(data) :
     metadata = MetaData(bind=engine, reflect=True)
     table = metadata.tables['ingest_hash']
     stmnt = table.insert().values(
-        hash = hash,
-        data = {"results" : result for result in data},
+        hash = hashx,
+        data = {"ingest" : data},
         time = datetime.now().isoformat()
     )
     with engine.connect() as conn :
         print(stmnt)
         result = conn.execute(stmnt)
         print(result)
-        conn.commit()
-    return hash
+        conn.close()
+    return hashx
 
 def global_pipeline() :
     data = update_global()
@@ -304,13 +304,27 @@ def global_pipeline() :
     metadata = MetaData(bind=engine, reflect=True)
     table = metadata.tables['hurricane_live']
     with engine.connect() as conn :
+        # reset live table
+        result = conn.execute('DELETE FROM hurricane_live')
         hurricane_rows = []
         for hurricane in data :
-            for entry in hurricane['data']['track_history'] :
-                hurricane_rows.append('yolo')
-        result = conn.execute(table.insert(), hurricanes)
+            num_entries = max(hurricane['data']['track_history']['Synoptic Time'].keys())
+            for entry in range(num_entries) :
+                hurricane_rows.append({
+                    #`id` VARCHAR(256) COMMENT 'The storm ID'
+                    'id' : hurricane['id'],
+                    #`time` TIMESTAMP COMMENT 'Time in ISO 1806 time format'
+                    'time' : hurricane['data']['track_history']['Synoptic Time'][entry],
+                    #`lat` VARCHAR(256) COMMENT 'The latitutde ISO 6709'
+                    'lat' : hurricane['data']['track_history']['Latitude'][entry],
+                    #`lon` VARCHAR(256) COMMENT 'The longitude ISO 6709'
+                    'lon' : hurricane['data']['track_history']['Longitude'][entry],
+                    #`int` VARCHAR(256) COMMENT 'The wind intensity in knots'
+                    'int' : hurricane['data']['track_history']['Intensity'][entry]
+                })
+        result = conn.execute(table.insert(), hurricane_rows)
         print(result)
-        conn.commit()
+        conn.close()
 
 if __name__ == "__main__" :
     update_global()

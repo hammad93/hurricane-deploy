@@ -8,6 +8,7 @@ Wind Intensity: Knots
 """
 
 from curses import meta
+from distutils.command.upload import upload
 import xmltodict
 import requests
 from datetime import datetime
@@ -190,7 +191,15 @@ def update_global():
         {
             "id" : string,
             "urls" : dict,
-            "data" : dict
+            "data" : {
+            # note that this data depends on the data source
+                'track_history' : {
+
+                },
+                'forecast_track' : {
+
+                }
+            }
         }
     '''
     config = {
@@ -231,7 +240,7 @@ def update_global():
                 'track_history' : pd.read_html(
                   str(tables[1]),
                   header = 0)[0].to_dict() if has_forecast else pd.read_html(
-                    str(tables[0]),
+                    str(tables[0]).to_dict(),
                     header = 0)[0]
             }
             print(f'[track_history] : {storm["data"]["track_history"]}')
@@ -247,12 +256,12 @@ def update_global():
     
     return storms
 
-def data_to_hash(df) :
+def data_to_hash(data) :
     '''
     Takes in a Pandas DataFrame and creates a MD5 hash
     in order to quickly compare if we have the same data
     '''
-    return hashlib.md5(str(df).encode()).hexdigest()
+    return hashlib.md5(str(data).encode()).hexdigest()
 
 def upload_hash(data) :
     '''
@@ -283,6 +292,25 @@ def upload_hash(data) :
         print(result)
         conn.commit()
     return hash
-    
+
+def global_pipeline() :
+    data = update_global()
+    # check if data is unique
+    hash = upload_hash(data)
+    if hash is None :
+        return
+    # process the data into the live database
+    engine = db.get_engine('hurricane_live')
+    metadata = MetaData(bind=engine, reflect=True)
+    table = metadata.tables['hurricane_live']
+    with engine.connect() as conn :
+        hurricane_rows = []
+        for hurricane in data :
+            for entry in hurricane['data']['track_history'] :
+                hurricane_rows.append('yolo')
+        result = conn.execute(table.insert(), hurricanes)
+        print(result)
+        conn.commit()
+
 if __name__ == "__main__" :
     update_global()

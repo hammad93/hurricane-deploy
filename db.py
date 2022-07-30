@@ -23,8 +23,8 @@ def query(q, database = 'hurricane_live', write = False):
     if write :
         with get_engine(database).connect() as conn :
             print(q)
-            result = conn.execute(q)
+            result = conn.execute(*q)
             print(result)
             conn.close()
         return result
-    return pd.read_sql(*q, get_engine(database))
+    return pd.read_sql(q, get_engine(database))

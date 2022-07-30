@@ -23,11 +23,6 @@ import db
 import sqlalchemy
 from sqlalchemy import MetaData, Table
 
-def query():
-    '''
-    Utilizes the local database to make a query.
-    '''
-
 def past_track(link):
     '''
     From a KMZ file of a storm in the NHC format, we extract the history
@@ -274,8 +269,8 @@ def upload_hash(data) :
     '''
     hashx = data_to_hash(data)
     results = db.query(
-        f'select hash from ingest_hash where hash = "{hashx}"',
-        'hurricane_live')
+        f'select hash from ingest_hash where hash = "{hashx}"'
+        )
     if len(results) > 0 :
         return False
     engine = db.get_engine('hurricane_live')
@@ -286,11 +281,7 @@ def upload_hash(data) :
         data = {"ingest" : data},
         time = datetime.now().isoformat()
     )
-    with engine.connect() as conn :
-        print(stmnt)
-        result = conn.execute(stmnt)
-        print(result)
-        conn.close()
+    db.query(q = (stmnt), write = True)
     return hashx
 
 def global_pipeline() :
@@ -304,28 +295,32 @@ def global_pipeline() :
     engine = db.get_engine('hurricane_live')
     metadata = MetaData(bind=engine, reflect=True)
     table = metadata.tables['hurricane_live']
-    with engine.connect() as conn :
-        # reset live table
-        result = conn.execute('DELETE FROM hurricane_live')
-        hurricane_rows = []
-        for hurricane in data :
-            num_entries = max(hurricane['data']['track_history']['Synoptic Time'].keys())
-            for entry in range(num_entries) :
-                hurricane_rows.append({
-                    #`id` VARCHAR(256) COMMENT 'The storm ID'
-                    'id' : hurricane['id'],
-                    #`time` TIMESTAMP COMMENT 'Time in ISO 1806 time format'
-                    'time' : hurricane['data']['track_history']['Synoptic Time'][entry],
-                    #`lat` VARCHAR(256) COMMENT 'The latitutde ISO 6709'
-                    'lat' : hurricane['data']['track_history']['Latitude'][entry],
-                    #`lon` VARCHAR(256) COMMENT 'The longitude ISO 6709'
-                    'lon' : hurricane['data']['track_history']['Longitude'][entry],
-                    #`int` VARCHAR(256) COMMENT 'The wind intensity in knots'
-                    'int' : hurricane['data']['track_history']['Intensity'][entry]
-                })
-        result = conn.execute(table.insert(), hurricane_rows)
-        print(result)
-        conn.close()
+    # reset live table
+    db.query(q = ('DELETE FROM hurricane_live'), write = True)
+    hurricane_rows = []
+    for hurricane in data :
+        num_entries = max(hurricane['data']['track_history']['Synoptic Time'].keys())
+        for entry in range(num_entries) :
+            hurricane_rows.append({
+                #`id` VARCHAR(256) COMMENT 'The storm ID'
+                'id' : hurricane['id'],
+                #`time` TIMESTAMP COMMENT 'Time in ISO 1806 time format'
+                'time' : hurricane['data']['track_history']['Synoptic Time'][entry],
+                #`lat` VARCHAR(256) COMMENT 'The latitutde ISO 6709'
+                'lat' : hurricane['data']['track_history']['Latitude'][entry],
+                #`lon` VARCHAR(256) COMMENT 'The longitude ISO 6709'
+                'lon' : hurricane['data']['track_history']['Longitude'][entry],
+                #`int` VARCHAR(256) COMMENT 'The wind intensity in knots'
+                'int' : hurricane['data']['track_history']['Intensity'][entry]
+            })
+    db.query(q = (table.insert(), hurricane_rows), write = True)
+
+def live_deltas():
+    '''
+    Returns a representation of the changes in the live data
+    '''
+    return 'undefined'
+
 
 if __name__ == "__main__" :
     update_global()

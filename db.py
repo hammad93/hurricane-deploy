@@ -16,8 +16,15 @@ def get_engine(database):
     '''
     return create_engine(connection_string(database))
 
-def query(q, database):
+def query(q, database = 'hurricane_live', write = False):
     '''
     Query the remote database and return as a dataframe
     '''
-    return pd.read_sql(q, get_engine(database))
+    if write :
+        with get_engine(database).connect() as conn :
+            print(q)
+            result = conn.execute(q)
+            print(result)
+            conn.close()
+        return result
+    return pd.read_sql(*q, get_engine(database))

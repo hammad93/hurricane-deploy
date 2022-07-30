@@ -281,7 +281,7 @@ def upload_hash(data) :
         data = {"ingest" : data},
         time = datetime.now().isoformat()
     )
-    db.query(q = (stmnt), write = True)
+    db.query(q = (stmnt,), write = True)
     return hashx
 
 def global_pipeline() :

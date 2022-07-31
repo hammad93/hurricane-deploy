@@ -38,6 +38,7 @@ BODY_TEXT = ("HURAIM Hourly Reports\r\n"
 
 # The HTML body of the email.
 data = update.nhc()
+global_data = update.global_pipeline()
 BODY_HTML = """<html>
 <head></head>
 <body>
@@ -100,6 +101,7 @@ for storm in data :
                 """
         html += "</table>"
     BODY_HTML += html
+BODY_HTML += global_data.to_html()
 BODY_HTML += """
 </body>
 </html>

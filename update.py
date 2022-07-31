@@ -22,6 +22,7 @@ import hashlib
 import db
 import sqlalchemy
 from sqlalchemy import MetaData, Table
+import json
 
 def past_track(link):
     '''
@@ -256,7 +257,7 @@ def data_to_hash(data) :
     Takes in a Pandas DataFrame and creates a MD5 hash
     in order to quickly compare if we have the same data
     '''
-    return hashlib.md5(str(data).encode()).hexdigest()
+    return hashlib.md5(json.dumps(data).encode()).hexdigest()
 
 def upload_hash(data) :
     '''
@@ -315,11 +316,14 @@ def global_pipeline() :
             })
     db.query(q = (table.insert(), hurricane_rows), write = True)
 
+    return pd.DataFrame(hurricane_rows)
+
 def live_deltas():
     '''
     Returns a representation of the changes in the live data
     '''
-    return 'undefined'
+    df = db.query('select data from ingest_hash')
+    return df
 
 
 if __name__ == "__main__" :

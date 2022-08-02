@@ -272,32 +272,24 @@ def upload_hash(data) :
     results = db.query(
         f'select hash from ingest_hash where hash = "{hashx}"'
         )
-    if len(results) > 0 :
-        return False
-    engine = db.get_engine('hurricane_live')
-    metadata = MetaData(bind=engine, reflect=True)
-    table = metadata.tables['ingest_hash']
-    stmnt = table.insert().values(
-        hash = hashx,
-        data = {"ingest" : data},
-        time = datetime.now().isoformat()
-    )
-    db.query(q = (stmnt,), write = True)
-    return hashx
+    if len(results) < 1 :
+        engine = db.get_engine('hurricane_live')
+        metadata = MetaData(bind=engine, reflect=True)
+        table = metadata.tables['ingest_hash']
+        stmnt = table.insert().values(
+            hash = hashx,
+            data = {"ingest" : data},
+            time = datetime.now().isoformat()
+        )
+        db.query(q = (stmnt,), write = True)
+    return {
+        'hash' : hashx,
+        'unique' : (len(results) < 1)
+    }
 
 def global_pipeline() :
     data = update_global()
-    # check if data is unique
-    hash = upload_hash(data)
-    print(f'data hash: {hash}')
-    if hash is None :
-        return
-    # process the data into the live database
-    engine = db.get_engine('hurricane_live')
-    metadata = MetaData(bind=engine, reflect=True)
-    table = metadata.tables['hurricane_live']
-    # reset live table
-    db.query(q = ('DELETE FROM hurricane_live',), write = True)
+    # generate data
     hurricane_rows = []
     for hurricane in data :
         num_entries = max(hurricane['data']['track_history']['Synoptic Time'].keys())
@@ -314,15 +306,32 @@ def global_pipeline() :
                 #`int` VARCHAR(256) COMMENT 'The wind intensity in knots'
                 'int' : hurricane['data']['track_history']['Intensity'][entry]
             })
-    db.query(q = (table.insert(), hurricane_rows), write = True)
+    # check if data is unique
+    hashx = upload_hash(hurricane_rows)
+    print(f'data hash: {hashx["hash"]}')
+    if hashx['unique'] :
+        # process the data into the live database
+        engine = db.get_engine('hurricane_live')
+        metadata = MetaData(bind=engine, reflect=True)
+        table = metadata.tables['hurricane_live']
+        # reset live table
+        db.query(q = ('DELETE FROM hurricane_live',), write = True)
+        db.query(q = (table.insert(), hurricane_rows), write = True)
 
-    return pd.DataFrame(hurricane_rows)
+    return {
+        'dataframe' : pd.DataFrame(hurricane_rows),
+        'hash' : hashx['hash']
+    }
 
 def live_deltas():
     '''
     Returns a representation of the changes in the live data
     '''
     df = db.query('select data from ingest_hash')
+    deltas = []
+    prev = None
+    for row in df.iterrows() :
+        row['data']
     return df
 
 

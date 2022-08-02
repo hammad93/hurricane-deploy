@@ -147,3 +147,5 @@ def send_email() :
 
 if global_data['unique'] :
   send_email()
+else :
+  print('Data ingested is not new.')

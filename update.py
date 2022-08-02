@@ -317,10 +317,10 @@ def global_pipeline() :
         # reset live table
         db.query(q = ('DELETE FROM hurricane_live',), write = True)
         db.query(q = (table.insert(), hurricane_rows), write = True)
-
     return {
         'dataframe' : pd.DataFrame(hurricane_rows),
-        'hash' : hashx['hash']
+        'hash' : hashx['hash'],
+        'unique' : hashx['unique']
     }
 
 def live_deltas():

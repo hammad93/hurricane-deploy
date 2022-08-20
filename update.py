@@ -236,8 +236,8 @@ def update_global():
                 'track_history' : pd.read_html(
                   str(tables[1]),
                   header = 0)[0].to_dict() if has_forecast else pd.read_html(
-                    str(tables[0])).to_dict(),
-                    header = 0)[0]
+                    str(tables[0]),
+                    header = 0)[0].to_dict()
             }
             print(f'[track_history] : {storm["data"]["track_history"]}')
             print(f'[forecast_track] : {storm["data"]["forecast_track"]}')

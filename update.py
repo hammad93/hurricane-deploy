@@ -272,9 +272,10 @@ def upload_hash(data) :
     results = db.query(
         f'select hash from ingest_hash where hash = "{hashx}"'
         )
-    if len(results) < 1 :
+    if len(results) < 1 : # sqlalchemy 1.4.39
         engine = db.get_engine('hurricane_live')
-        metadata = MetaData(bind=engine, reflect=True)
+        metadata = MetaData()
+        metadata.reflect(bind=engine)
         table = metadata.tables['ingest_hash']
         stmnt = table.insert().values(
             hash = hashx,
@@ -312,7 +313,8 @@ def global_pipeline() :
     if hashx['unique'] :
         # process the data into the live database
         engine = db.get_engine('hurricane_live')
-        metadata = MetaData(bind=engine, reflect=True)
+        metadata = MetaData()
+        metadata.reflect(bind=engine)
         table = metadata.tables['hurricane_live']
         # reset live table
         db.query(q = ('DELETE FROM hurricane_live',), write = True)

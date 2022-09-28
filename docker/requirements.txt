@@ -2,4 +2,5 @@ google-api-python-client
 google.cloud.storage
 oauth2client
 fastapi
-"uvicorn[standard]"
+uvicorn[standard]
+mysqlclient

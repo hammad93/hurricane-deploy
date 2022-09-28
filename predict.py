@@ -5,17 +5,14 @@ import pandas as pd
 import logging
 import requests
 import json
-from google.cloud import storage
 from datetime import timedelta
 from datetime import timezone
-import googleapiclient.discovery
+import config
 
-def download_file(filename) :
-    storage_client = storage.Client()
-    bucket = storage_client.bucket('cyclone-ai.appspot.com')
-    blob = bucket.blob(filename)
-    blob.download_to_filename(f'/root/{filename.split("/")[-1]}')
-
+def download_file(url) :
+    response = requests.get(url)
+    with open(f'/root/{url.split("/")[-1]}', "wb") as file:
+        file.write(response.content)
 
 def feature_extraction(timestep, previous):
     '''
@@ -111,7 +108,7 @@ def predict_universal(data = None) :
         raw = update.nhc()
 
     # read in the scaler
-    download_file('model_artifacts/universal/feature_scaler.pkl')
+    download_file(config.feature_scaler_path)
     with open('/root/feature_scaler.pkl', 'rb') as f :
         scaler = pickle.load(f)
 

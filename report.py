@@ -15,7 +15,7 @@ logging.basicConfig(filename='report.log', level=logging.DEBUG)
 SENDER = 'husmani@fluids.ai'
 SENDERNAME = 'Hurricane AI'
 
-RECIPIENTS  = 'hammadus@gmail.com,hurricaneaiml@gmail.com'
+RECIPIENTS  = 'hammadus@gmail.com;hurricaneaiml@gmail.com'
 
 # SMTP Credentials
 credentials_df = pd.read_csv('/root/credentials.csv')
@@ -129,22 +129,21 @@ def send_email() :
 
   # Try to send the messages to the recipients
   # RECIPIENTS must be comma separated
-  for RECIPIENT in RECIPIENTS.split(',') :
-    msg['To'] = RECIPIENT
-    try:
-      server = smtplib.SMTP(HOST, PORT)
-      server.ehlo()
-      server.starttls()
-      #stmplib docs recommend calling ehlo() before & after starttls()
-      server.ehlo()
-      server.login(USERNAME_SMTP, PASSWORD_SMTP)
-      server.sendmail(SENDER, RECIPIENT, msg.as_string())
-      server.close()
-    # Display an error message if something goes wrong.
-    except Exception as e:
-      print ("Error: ", e)
-    else:
-      print (f"Email sent to {RECIPIENT}")
+  msg['To'] = RECIPIENTS
+  try:
+    server = smtplib.SMTP(HOST, PORT)
+    server.ehlo()
+    server.starttls()
+    #stmplib docs recommend calling ehlo() before & after starttls()
+    server.ehlo()
+    server.login(USERNAME_SMTP, PASSWORD_SMTP)
+    server.sendmail(SENDER, RECIPIENTS.split(';'), msg.as_string())
+    server.close()
+  # Display an error message if something goes wrong.
+  except Exception as e:
+    print ("Error: ", e)
+  else:
+    print (f"Email sent to {RECIPIENTS}")
 
 if global_data['unique'] :
   send_email()

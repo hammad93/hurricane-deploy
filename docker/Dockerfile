@@ -5,7 +5,6 @@ FROM continuumio/anaconda3
 COPY credentials.csv /root/
 
 # Python additional requirements
-RUN apt-get install -y python-dev
 COPY requirements.txt /root/
 RUN pip install -r /root/requirements.txt
 

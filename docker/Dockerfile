@@ -1,4 +1,4 @@
-FROM continuumio/anaconda3:2020.07
+FROM continuumio/anaconda3
 
 # SMTP credentials
 

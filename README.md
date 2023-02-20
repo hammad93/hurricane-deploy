@@ -11,6 +11,10 @@ learning and deep learning methods
 
 Note that the virtualized deployment utilizes the cron script, `0 * * * * python /hurricane-deploy/report.py >> /var/log/cron.log 2>&1`, to generate reports.
 
+## Credentials
+
+The credentials in CSV format need to be in the directory named `credentials.csv`
+
 ## Import most recent Atlantic tropical storms
 
 From this NHC resource described here, , we can import the most recent tropical

@@ -1,3 +1,1 @@
-oauth2client
-fastapi
-uvicorn[standard]
+django

@@ -17,12 +17,6 @@ def download_model(url) :
     url String
         The public URL where we can download online the .pb file
 
-
-    Notes
-    -----
-    - The authentication uses the default Python Google Cloud API
-    configuration JSON
-
     '''
     model_directory = config.forecast_model_dir
 

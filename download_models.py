@@ -6,6 +6,7 @@ download the hurricane artificial intelligence model files
 into the /root/ directory
 '''
 import os
+import config
 
 def download_model(url) :
     '''

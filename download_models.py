@@ -27,4 +27,5 @@ def download_model(url) :
     # Download the model using wget
     os.system(f"wget {url} -P {model_directory}")
 
-download_model(config.forecast_model)
+if __name__ == "__main__":
+    download_model(config.forecast_model)

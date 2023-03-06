@@ -222,12 +222,35 @@ def update_global_hwrf():
     # filter it to just the track, has a b in the first letter of the name
     filtered_links = [link for link in links if link.split('/')[-1][0] == 'b']
     # for each link, download it and append to an array
-    print('Downloading . . .')
     column_names = config['column_names'] + [f'unk_{i + 1}' for i in range(config['column_buffer'])]
-    active_storms = pd.concat([pd.read_csv(link, names=column_names) for link in filtered_links])
+    active_storms = pd.concat([pd.read_csv(link, names=column_names) for link in filtered_links],
+        ignore_index = True)
     # trim buffered columns
     active_storms = active_storms.dropna(axis=1, how='all')
-    return downloads # TODO proper data structure
+    # change data types of columns
+    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H') for time in active_storms['time']]
+    def process_coord(c):
+        '''
+        The coordinates in the files are in a different 
+        coordinate format like 262N. The data description
+        claims that we can divide by 10 and get the 
+        decimal representation. This function tries to output
+        in decimal degrees. A positive value for North and East,
+        a negative value for South and West. 
+        '''
+        value = float(c[:-1]) / 10
+        direction = c[-1:]
+        return value if direction in ['N', 'E'] else -value
+    active_storms['lat'] = [process_coord(c) for c in active_storms['lat']]
+    active_storms['lon'] = [process_coord(c) for c in active_storms['lon']]
+    active_storms['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
+        active_storms['basin'],
+        active_storms['id'],
+        active_storms['time'])]
+    # drop duplicates that might have some extra data
+    postprocessed_data = active_storms.drop_duplicates(
+        subset=['basin', 'id', 'time', 'model', 'lead_time', 'lat', 'lon', 'wind', 'pressure'])
+    return postprocessed_data # TODO proper data structure
 def update_global_rammb():
     '''
     Provides data based on current global storms based on the RAMMB data

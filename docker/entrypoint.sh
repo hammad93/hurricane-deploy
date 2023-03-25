@@ -10,7 +10,7 @@ python /hurricane-deploy/download_models.py
 nohup tensorflow_model_server --model_base_path=/root/forecast --rest_api_port=9000 --model_name=hurricane 2>&1 &
 
 # run the API
-nohup uvicorn /hurricane-deploy/run:app --port 1337 --reload 2>&1 &
+nohup python /hurricane-deploy/run.py 2>&1 &
 
 # Setup a cron schedule
 echo "SHELL=/bin/bash

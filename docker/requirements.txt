@@ -1,4 +1,5 @@
 oauth2client
 fastapi
 uvicorn[standard]
-mysqlclient
+pymysql
+

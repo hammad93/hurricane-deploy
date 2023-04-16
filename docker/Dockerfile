@@ -5,7 +5,6 @@ FROM continuumio/anaconda3:2020.07
 COPY credentials.csv /root/
 
 # Python additional requirements
-RUN apt-get install -y python-dev
 COPY requirements.txt /root/
 RUN pip install -r /root/requirements.txt
 
@@ -13,7 +12,7 @@ RUN pip install -r /root/requirements.txt
 RUN conda install -y mysqlclient
 
 # Add git repository
-RUN git clone --single-branch --branch master https://github.com/hammad93/hurricane-deploy.git
+RUN git clone --single-branch --branch main https://github.com/hammad93/hurricane-deploy.git
 
 # Setup cron job
 RUN apt-get --allow-releaseinfo-change update && apt-get -y install cron

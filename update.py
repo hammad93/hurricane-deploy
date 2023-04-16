@@ -175,10 +175,85 @@ def nhc() :
             results.append(storm)
 
     return results
-
-def update_global():
+def update_global_hwrf():
     '''
-    Provides data based on current global storms
+    Provides data based on current global storms based on the HWRF data
+
+    https://dtcenter.org/sites/default/files/community-code/hwrf/docs/users_guide/HWRF-UG-2018.pdf
+    - Page 154 column and data descriptions
+    Returns
+    -------
+    array of dict
+        Each dictionary is in the following form,
+        {
+            "id" : string,
+        }
+    '''
+    config = {
+        'url': 'https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/',
+        'freq': 21000, # frequency, in seconds
+        'time_column': 'Last Change',
+        'column_names': ['basin', 'id', 'time', 'is_f', 'model', 'lead_time',
+                        'lat', 'lon', 'wind', 'pressure', 'label', 'radii_threshold', 'radii_begin',
+                        'wind_radii_1', 'wind_radii_2', 'wind_radii_3', 'wind_radii_4', 'isobar_pressure',
+                        'isobar_radius', 'max_wind_radius', 'var_1', 'var_2', 'var_3', 'var_4', 'var_5', 
+                        'var_6', 'var_7', 'name', 'var_8'],
+        'column_buffer': 20,
+    }
+    # read in table from link, this is the only (first) table
+    update_table = pd.read_html(config['url'])[0]
+    # get relevant table
+    update_table['timestamp'] = [time.timestamp() for time in pd.to_datetime(update_table[config['time_column']])]
+    # the table has many entries, so we only parse the most recent one
+    # according to the frequency
+    timestamp_threshold = datetime.now().timestamp() - (config['freq'] * 2)
+    data = update_table[update_table['timestamp'] > timestamp_threshold]
+    # construct links to applicable data
+    links = [config['url'] + fname for fname in data['File Name']]
+    '''
+    example,
+    ['https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/ash972023.dat',
+    'https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/bsh972023.dat',
+    'https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/ash162023.dat',
+     :
+     :
+    'https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/bsh162023.dat',]
+    '''
+    # filter it to just the track, has a b in the first letter of the name
+    filtered_links = [link for link in links if link.split('/')[-1][0] == 'b']
+    # for each link, download it and append to an array
+    column_names = config['column_names'] + [f'unk_{i + 1}' for i in range(config['column_buffer'])]
+    active_storms = pd.concat([pd.read_csv(link, names=column_names) for link in filtered_links],
+        ignore_index = True)
+    # trim buffered columns
+    active_storms = active_storms.dropna(axis=1, how='all')
+    # change data types of columns
+    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H') for time in active_storms['time']]
+    def process_coord(c):
+        '''
+        The coordinates in the files are in a different 
+        coordinate format like 262N. The data description
+        claims that we can divide by 10 and get the 
+        decimal representation. This function tries to output
+        in decimal degrees. A positive value for North and East,
+        a negative value for South and West. 
+        '''
+        value = float(c[:-1]) / 10
+        direction = c[-1:]
+        return value if direction in ['N', 'E'] else -value
+    active_storms['lat'] = [process_coord(c) for c in active_storms['lat']]
+    active_storms['lon'] = [process_coord(c) for c in active_storms['lon']]
+    active_storms['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
+        active_storms['basin'],
+        active_storms['id'],
+        active_storms['time'])]
+    # drop duplicates that might have some extra data
+    postprocessed_data = active_storms.drop_duplicates(
+        subset=['basin', 'id', 'time', 'model', 'lead_time', 'lat', 'lon', 'wind', 'pressure'])
+    return postprocessed_data # TODO proper data structure
+def update_global_rammb():
+    '''
+    Provides data based on current global storms based on the RAMMB data
 
     Returns
     -------
@@ -251,6 +326,12 @@ def update_global():
             storms.append(storm)
     
     return storms
+
+def update_global():
+    '''
+    This function decides which global ingestion to use
+    '''
+    return update_global_rammb()
 
 def data_to_hash(data) :
     '''

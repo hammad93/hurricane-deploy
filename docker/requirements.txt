@@ -1,5 +1,4 @@
-oauth2client
+xmltodict
 fastapi
 uvicorn[standard]
 pymysql
-

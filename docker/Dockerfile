@@ -1,4 +1,4 @@
-FROM continuumio/anaconda3:2020.07
+FROM continuumio/anaconda3
 
 # SMTP credentials
 
@@ -8,7 +8,7 @@ COPY credentials.csv /root/
 COPY requirements.txt /root/
 RUN pip install -r /root/requirements.txt
 
-# Conda
+# Database engine
 RUN conda install -y mysqlclient
 
 # Add git repository

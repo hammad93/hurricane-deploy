@@ -191,7 +191,7 @@ def update_global_hwrf():
     '''
     config = {
         'url': 'https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/',
-        'freq': 21000, # frequency, in seconds
+        'freq': 21600, # (6 hours) frequency, in seconds
         'time_column': 'Last Change',
         'column_names': ['basin', 'id', 'time', 'is_f', 'model', 'lead_time',
                         'lat', 'lon', 'wind', 'pressure', 'label', 'radii_threshold', 'radii_begin',
@@ -205,8 +205,8 @@ def update_global_hwrf():
     # get relevant table
     update_table['timestamp'] = [time.timestamp() for time in pd.to_datetime(update_table[config['time_column']])]
     # the table has many entries, so we only parse the most recent one
-    # according to the frequency
-    timestamp_threshold = datetime.now().timestamp() - (config['freq'] * 2)
+    # according to the frequency. We use the most recent in a day
+    timestamp_threshold = datetime.now().timestamp() - (config['freq'] * 4)
     data = update_table[update_table['timestamp'] > timestamp_threshold]
     # construct links to applicable data
     links = [config['url'] + fname for fname in data['File Name']]

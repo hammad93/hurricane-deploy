@@ -250,7 +250,10 @@ def update_global_hwrf():
     # drop duplicates that might have some extra data
     postprocessed_data = active_storms.drop_duplicates(
         subset=['basin', 'id', 'time', 'model', 'lead_time', 'lat', 'lon', 'wind', 'pressure'])
-    return postprocessed_data # TODO proper data structure
+    # rename columns to match data structure
+    postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
+    postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
+    return postprocessed_data
 def update_global_rammb():
     '''
     Provides data based on current global storms based on the RAMMB data
@@ -331,7 +334,7 @@ def update_global():
     '''
     This function decides which global ingestion to use
     '''
-    return update_global_rammb()
+    return update_global_hwrf()
 
 def data_to_hash(data) :
     '''
@@ -372,22 +375,7 @@ def upload_hash(data) :
 def global_pipeline() :
     data = update_global()
     # generate data
-    hurricane_rows = []
-    for hurricane in data :
-        num_entries = max(hurricane['data']['track_history']['Synoptic Time'].keys())
-        for entry in range(num_entries) :
-            hurricane_rows.append({
-                #`id` VARCHAR(256) COMMENT 'The storm ID'
-                'id' : hurricane['id'],
-                #`time` TIMESTAMP COMMENT 'Time in ISO 1806 time format'
-                'time' : hurricane['data']['track_history']['Synoptic Time'][entry],
-                #`lat` VARCHAR(256) COMMENT 'The latitutde ISO 6709'
-                'lat' : hurricane['data']['track_history']['Latitude'][entry],
-                #`lon` VARCHAR(256) COMMENT 'The longitude ISO 6709'
-                'lon' : hurricane['data']['track_history']['Longitude'][entry],
-                #`int` VARCHAR(256) COMMENT 'The wind intensity in knots'
-                'int' : hurricane['data']['track_history']['Intensity'][entry]
-            })
+    hurricane_rows = data[['id', 'time', 'lat', 'lon', 'int']].to_dict('records')
     # check if data is unique
     hashx = upload_hash(hurricane_rows)
     print(f'data hash: {hashx["hash"]}')

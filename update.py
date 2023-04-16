@@ -253,6 +253,7 @@ def update_global_hwrf():
     # rename columns to match data structure
     postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
     postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
+    postprocessed_data['time'] = [timestamp.isoformat() for timestamp in postprocessed_data]
     return postprocessed_data
 def update_global_rammb():
     '''

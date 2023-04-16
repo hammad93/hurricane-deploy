@@ -28,12 +28,11 @@ async def get_live_storms() -> List[StormData]:
         list: A list of dictionaries containing the current live tropical storms
               with keys: id, time, lat, lon, and int.
     """
-    try:
-        df = db.query("SELECT * FROM hurricane_live")
-        storms = df.to_dict(orient="records")
-        return storms
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="An error occurred while fetching storm data.")
+    data = db.query("SELECT * FROM hurricane_live")
+    data['time'] = data['time'].astype(str)  # Convert 'time' column to string
+    data = data.rename(columns={'int': 'wind_speed'})  # Rename 'int' column to 'wind_speed'
+    storms = data.to_dict(orient="records")
+    return storms
 
 
 if __name__ == "__main__":

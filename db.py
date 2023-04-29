@@ -1,12 +1,13 @@
 from sqlalchemy import create_engine
 import pandas as pd
+import config
 
 
 def connection_string(database):
     '''
     Creates the connection string to the specified database
     '''
-    credentials_df = pd.read_csv('/root/credentials.csv')
+    credentials_df = pd.read_csv(config.credentials_dir)
     config = credentials_df.iloc[1]
     return f"mysql://{config['user']}:{config['pass']}@{config['host']}:{config['port']}/{database}"
 

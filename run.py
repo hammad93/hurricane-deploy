@@ -2,7 +2,9 @@ from typing import Union, List
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+import config
 import db
+import hurricane_net_chatgpt
 
 app = FastAPI()
 
@@ -34,6 +36,16 @@ async def get_live_storms() -> List[StormData]:
     storms = data.to_dict(orient="records")
     return storms
 
+@app.get("/chatgpt_forecast_storm_live", response_model=List[StormData])
+async def chatgpt_forecast_storm_live() -> List[StormData]:
+    '''
+    '''
+    forecast = chatgpt.chatgpt_forecast_live()
+    return forecast.to_dict(orient="records")
+
 
 if __name__ == "__main__":
+    # Set ChatGPT password
+    passwords = pd.read_csv(config.credentials_dir)
+    os.environ["OPENAI_API_KEY"] = passwords[passwords['user'] == 'openai'].iloc[0]['pass']
     uvicorn.run("run:app", host="0.0.0.0", port=1337, reload=True)

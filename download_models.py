@@ -3,7 +3,10 @@ Hammad Usmani
 
 When running this script, `python download_models.py` it will
 download the hurricane artificial intelligence model files
-into the /root/ directory
+into the /root/ directory.
+
+It will also place a ChatGPT class for prediciting tropical storms
+that can be imported like import hurricane_net_chatgpt
 '''
 import os
 import config
@@ -27,6 +30,10 @@ def download_model(url) :
 
     # Download the model using wget
     os.system(f"wget {url} -P {model_directory}")
-
+    
 if __name__ == "__main__":
     download_model(config.forecast_model)
+    
+    # Download ChatGPT in the same way
+    os.system(f"wget {conifg.forecast_chatgpt} -P {os.path.abspath(os.path.dirname(__file__))}")
+

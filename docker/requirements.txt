@@ -2,3 +2,4 @@ xmltodict
 fastapi
 uvicorn[standard]
 pymysql
+openai

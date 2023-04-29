@@ -39,7 +39,7 @@ async def get_live_storms() -> List[StormData]:
     return storms
 
 @app.get("/chatgpt_forecast_storm_live")
-async def chatgpt_forecast_storm_live():
+def chatgpt_forecast_storm_live():
     '''
     '''
     forecast = chatgpt.chatgpt_forecast_live()

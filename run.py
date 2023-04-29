@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 import config
 import db
 import hurricane_net_chatgpt
+import pandas as pd
 
 app = FastAPI()
 

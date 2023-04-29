@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import config
 import db
-import hurricane_net_chatgpt
+import hurricane_net_chatgpt as chatgpt
 import pandas as pd
 import os
 

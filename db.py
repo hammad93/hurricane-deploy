@@ -9,7 +9,7 @@ def connection_string(database):
     '''
     credentials_df = pd.read_csv(config.credentials_dir)
     auth = credentials_df.iloc[1]
-    return f"mysql://{auth['user']}:{auth['pass']}@{auth['host']}:{auth['port']}/{database}"
+    return f"mysql://{auth['user']}:{auth['pass']}@{auth['host']}:{int(auth['port'])}/{database}"
 
 def get_engine(database):
     '''

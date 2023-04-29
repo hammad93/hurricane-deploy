@@ -6,6 +6,7 @@ import config
 import db
 import hurricane_net_chatgpt
 import pandas as pd
+import os
 
 app = FastAPI()
 

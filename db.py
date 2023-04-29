@@ -8,8 +8,8 @@ def connection_string(database):
     Creates the connection string to the specified database
     '''
     credentials_df = pd.read_csv(config.credentials_dir)
-    config = credentials_df.iloc[1]
-    return f"mysql://{config['user']}:{config['pass']}@{config['host']}:{config['port']}/{database}"
+    auth = credentials_df.iloc[1]
+    return f"mysql://{auth['user']}:{auth['pass']}@{auth['host']}:{auth['port']}/{database}"
 
 def get_engine(database):
     '''

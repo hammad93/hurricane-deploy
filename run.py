@@ -43,6 +43,7 @@ def chatgpt_forecast_storm_live():
     '''
     '''
     forecast = chatgpt.chatgpt_forecast_live()
+    forecast = pd.concat(forecast)
     return forecast.to_dict(orient="records")
 
 

@@ -38,8 +38,8 @@ async def get_live_storms() -> List[StormData]:
     storms = data.to_dict(orient="records")
     return storms
 
-@app.get("/chatgpt_forecast_storm_live", response_model=List[StormData])
-async def chatgpt_forecast_storm_live() -> List[StormData]:
+@app.get("/chatgpt_forecast_storm_live")
+async def chatgpt_forecast_storm_live():
     '''
     '''
     forecast = chatgpt.chatgpt_forecast_live()

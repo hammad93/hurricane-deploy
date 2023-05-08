@@ -7,6 +7,8 @@ import datetime
 import email.utils
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import requests
+import config
 import os
 
 # Setup logs
@@ -147,5 +149,7 @@ def send_email() :
 
 if global_data['unique'] :
   send_email()
+  forecasts = requests.get(config.chatgpt_forecast_api)
+  print(forecasts.content)
 else :
   print('Data ingested is not new.')

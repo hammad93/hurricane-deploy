@@ -9,7 +9,7 @@ import pandas as pd
 import os
 
 app = FastAPI()
-
+cache = {}
 
 @app.get("/")
 def read_root():
@@ -42,10 +42,15 @@ async def get_live_storms() -> List[StormData]:
 def chatgpt_forecast_storm_live():
     '''
     '''
+    global cache
     forecast = chatgpt.chatgpt_forecast_live()
     forecast = pd.concat(forecast)
+    cache['chatgpt'] = forecast
     return forecast.to_dict(orient="records")
 
+@app.get('/forecasts')
+def forecasts():
+    return cache['chatgpt']
 
 if __name__ == "__main__":
     # Set ChatGPT password

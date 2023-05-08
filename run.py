@@ -45,8 +45,8 @@ def chatgpt_forecast_storm_live():
     global cache
     forecast = chatgpt.chatgpt_forecast_live()
     forecast = pd.concat(forecast)
-    cache['chatgpt'] = forecast
-    return forecast.to_dict(orient="records")
+    cache['chatgpt'] = forecast.to_dict(orient="records")
+    return cache['chatgpt']
 
 @app.get('/forecasts')
 def forecasts():

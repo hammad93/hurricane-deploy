@@ -50,6 +50,7 @@ def chatgpt_forecast_storm_live():
 
 @app.get('/forecasts')
 def forecasts():
+    global cache
     return cache['chatgpt']
 
 if __name__ == "__main__":

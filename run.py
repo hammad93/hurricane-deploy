@@ -31,6 +31,8 @@ class StormData(BaseModel):
     lat: float = Field(..., description="Latitude in decimal degrees")
     lon: float = Field(..., description="Longitude in decimal degrees")
     wind_speed: int = Field(..., description="Maximum sustained wind speed in knots")
+    wind_speed_mph: float = Field(..., description="Maximum sustained wind speed in miles per hour")
+    wind_speed_kph: float = Field(..., description="Maximum sustained wind speed in kilometers per hour")
 
 @app.get("/live-storms", response_model=List[StormData])
 async def get_live_storms() -> List[StormData]:

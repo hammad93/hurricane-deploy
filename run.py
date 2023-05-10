@@ -46,10 +46,11 @@ async def get_live_storms() -> List[StormData]:
     data = db.query("SELECT * FROM hurricane_live")
     data['time'] = data['time'].astype(str)  # Convert 'time' column to string
     data = data.rename(columns={'int': 'wind_speed'})  # Rename 'int' column to 'wind_speed'
-    # wind speed is in knots
-    data['wind_speed_mph'] = data['wind_speed'] * 1.852
-    data['wind_speed_kph'] = data['wind_speed'] * 1.15078
     storms = data.to_dict(orient="records")
+    for storm in storms:
+        # wind speed is in knots
+        storm['wind_speed_mph'] = storm['wind_speed'] * 1.852
+        storm['wind_speed_kph'] = storm['wind_speed'] * 1.15078
     return storms
 
 @app.get("/chatgpt_forecast_storm_live")

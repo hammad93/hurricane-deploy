@@ -49,8 +49,8 @@ async def get_live_storms() -> List[StormData]:
     storms = data.to_dict(orient="records")
     for storm in storms:
         # wind speed is in knots
-        storm['wind_speed_mph'] = storm['wind_speed'] * 1.852
-        storm['wind_speed_kph'] = storm['wind_speed'] * 1.15078
+        storm['wind_speed_mph'] = int(storm['wind_speed']) * 1.852
+        storm['wind_speed_kph'] = int(storm['wind_speed']) * 1.15078
     return storms
 
 @app.get("/chatgpt_forecast_storm_live")

@@ -4,3 +4,4 @@ forecast_chatgpt='https://raw.githubusercontent.com/hammad93/hurricane-net/main/
 forecast_model_dir='/root/forecast/1'
 credentials_dir='/root/credentials.csv'
 chatgpt_forecast_api='http://fluids.ai:1337/chatgpt_forecast_storm_live'
+current_forecasts_api='http://fluids.ai:1337/forecasts'

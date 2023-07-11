@@ -43,6 +43,8 @@ BODY_TEXT = ("HURAIM Hourly Reports\r\n"
 data = update.nhc()
 global_data = update.global_pipeline()
 def send_email() :
+  # get current forecasts to report
+  current_forecasts = requests.get(config.current_forecasts_api).json()
   BODY_HTML = """<html>
   <head></head>
   <body>
@@ -107,7 +109,8 @@ def send_email() :
       BODY_HTML += html
   BODY_HTML += "<h2>Global Storms</h2>"
   BODY_HTML += global_data['dataframe'].to_html()
-  BODY_HTML += """
+  BODY_HTML += f"""
+  {str(current_forecasts)}
   </body>
   </html>
               """
@@ -148,8 +151,9 @@ def send_email() :
     print (f"Email sent to {RECIPIENTS}")
 
 if global_data['unique'] :
-  send_email()
   forecasts = requests.get(config.chatgpt_forecast_api)
   print(forecasts.content)
+  send_email()
 else :
   print('Data ingested is not new.')
+

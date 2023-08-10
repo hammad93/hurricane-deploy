@@ -58,7 +58,10 @@ def chatgpt_forecast_storm_live():
     '''
     '''
     global cache
-    forecast = chatgpt.chatgpt_forecast_live()
+    try:
+        forecast = chatgpt.chatgpt_forecast_live()
+    except Exception as e:
+        return str(e)
     forecast = pd.concat(forecast)
     cache['chatgpt'] = forecast.to_dict(orient="records")
     return cache['chatgpt']

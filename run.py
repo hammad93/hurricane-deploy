@@ -66,6 +66,14 @@ def chatgpt_forecast_storm_live():
     cache['chatgpt'] = forecast.to_dict(orient="records")
     return cache['chatgpt']
 
+@app.get("/chatgpt_forecast_live_singular")
+def chatgpt_forecast_live_singular():
+    '''
+    Ask the LLM to forecast for a single forecast time.
+    '''
+    global cache
+    return chatgpt.chatgpt_reflection_forecast_concurrent()
+
 @app.get('/forecasts')
 def forecasts():
     global cache

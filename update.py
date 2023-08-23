@@ -228,7 +228,7 @@ def update_global_hwrf():
     # trim buffered columns
     active_storms = active_storms.dropna(axis=1, how='all')
     # change data types of columns
-    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H') for time in active_storms['time']]
+    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('US/Eastern')) for time in active_storms['time']]
     def process_coord(c):
         '''
         The coordinates in the files are in a different 

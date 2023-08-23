@@ -72,7 +72,13 @@ def chatgpt_forecast_live_singular():
     Ask the LLM to forecast for a single forecast time.
     '''
     global cache
-    return chatgpt.chatgpt_reflection_forecast_concurrent()
+    try :
+        result = chatgpt.chatgpt_reflection_forecast_concurrent()
+    except Exception as e :
+        result = e
+    cache['chatgpt'] = result
+    print(result)
+    return result
 
 @app.get('/forecasts')
 def forecasts():

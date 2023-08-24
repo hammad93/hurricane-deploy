@@ -73,7 +73,7 @@ def chatgpt_forecast_live_singular():
     '''
     global cache
     try :
-        result = chatgpt.chatgpt_reflection_forecast_concurrent()
+        result = chatgpt.chatgpt_reflection_forecast_concurrent(model='gpt-4)
     except Exception as e :
         result = e
     cache['chatgpt'] = result

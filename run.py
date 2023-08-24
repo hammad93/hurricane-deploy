@@ -59,7 +59,7 @@ def chatgpt_forecast_storm_live():
     '''
     global cache
     try:
-        forecast = chatgpt.chatgpt_forecast_live()
+        forecast = chatgpt.chatgpt_forecast_live(model_version='gpt-4')
     except Exception as e:
         return str(e)
     forecast = pd.concat(forecast)

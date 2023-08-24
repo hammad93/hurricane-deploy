@@ -54,12 +54,12 @@ async def get_live_storms() -> List[StormData]:
     return storms
 
 @app.get("/chatgpt_forecast_storm_live")
-def chatgpt_forecast_storm_live():
+def chatgpt_forecast_storm_live(model='gpt-3.5-turbo'):
     '''
     '''
     global cache
     try:
-        forecast = chatgpt.chatgpt_forecast_live(model_version='gpt-4')
+        forecast = chatgpt.chatgpt_forecast_live(model_version=model)
     except Exception as e:
         return str(e)
     forecast = pd.concat(forecast)
@@ -67,13 +67,13 @@ def chatgpt_forecast_storm_live():
     return cache['chatgpt']
 
 @app.get("/chatgpt_forecast_live_singular")
-def chatgpt_forecast_live_singular():
+def chatgpt_forecast_live_singular(model='gpt-3.5-turbo'):
     '''
     Ask the LLM to forecast for a single forecast time.
     '''
     global cache
     try :
-        result = chatgpt.chatgpt_reflection_forecast_concurrent(model='gpt-4')
+        result = chatgpt.chatgpt_reflection_forecast_concurrent(model=model)
     except Exception as e :
         result = e
     cache['chatgpt'] = result

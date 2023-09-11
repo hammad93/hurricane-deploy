@@ -58,19 +58,28 @@ async def get_live_storms() -> List[StormData]:
     return storms
 
 @app.get("/chatgpt_forecast_storm_live")
-def chatgpt_forecast_storm_live(model='gpt-3.5-turbo'):
+def chatgpt_forecast_storm_live(model='all'):
     '''
     We utilize the chat completion from OpenAI and prompt for forecasts
     one storm at a time.
     '''
     global cache
-    try:
-        forecast = chatgpt.chatgpt_forecast_live(model_version=model)
-    except Exception as e:
-        return str(e)
+    # Generate all available forecasts from the framework
+    if model == 'all' :
+        available_models = ['gpt-3.5-turbo', 'gpt-4']
+        forecast = []
+        for _model in available_models :
+            try:
+                # We use the script to get current live storms and feed it into the LLM
+                forecast.extend(chatgpt.chatgpt_forecast_live(model_version=_model))
+            except Exception as e:
+                return str(e)
+    else :
+        try:
+            forecast = chatgpt.chatgpt_forecast_live(model_version=model)
+        except Exception as e:
+            return str(e)
     forecast = pd.concat(forecast)
-    # add column with model name
-    forecast['model'] = model
     cache['forecasts'] = forecast.to_dict(orient="records")
     return cache['forecasts']
 

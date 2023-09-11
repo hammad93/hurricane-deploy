@@ -60,6 +60,8 @@ async def get_live_storms() -> List[StormData]:
 @app.get("/chatgpt_forecast_storm_live")
 def chatgpt_forecast_storm_live(model='gpt-3.5-turbo'):
     '''
+    We utilize the chat completion from OpenAI and prompt for forecasts
+    one storm at a time.
     '''
     global cache
     try:
@@ -67,8 +69,10 @@ def chatgpt_forecast_storm_live(model='gpt-3.5-turbo'):
     except Exception as e:
         return str(e)
     forecast = pd.concat(forecast)
-    cache['chatgpt'] = forecast.to_dict(orient="records")
-    return cache['chatgpt']
+    # add column with model name
+    forecast['model'] = model
+    cache['forecasts'] = forecast.to_dict(orient="records")
+    return cache['forecasts']
 
 @app.get("/chatgpt_forecast_live_singular")
 def chatgpt_forecast_live_singular(model='gpt-3.5-turbo'):
@@ -80,14 +84,14 @@ def chatgpt_forecast_live_singular(model='gpt-3.5-turbo'):
         result = chatgpt.chatgpt_reflection_forecast_concurrent(model=model)
     except Exception as e :
         result = e
-    cache['chatgpt'] = result
+    cache['forecasts'] = result
     print(result)
     return result
 
 @app.get('/forecasts')
 def forecasts():
     global cache
-    return cache['chatgpt']
+    return cache['forecasts']
 
 if __name__ == "__main__":
     # Set ChatGPT password

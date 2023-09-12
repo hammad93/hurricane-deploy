@@ -71,12 +71,16 @@ def chatgpt_forecast_storm_live(model='all'):
         for _model in available_models :
             try:
                 # We use the script to get current live storms and feed it into the LLM
-                forecast.extend(chatgpt.chatgpt_forecast_live(model_version=_model))
+                preprocessed = chatgpt.chatgpt_forecast_live(model_version=_model)
+                processed = [f.update({'model': _model}) for f in preprocessed]
+                forecast.extend(processed)
             except Exception as e:
                 return str(e)
     else :
         try:
-            forecast = chatgpt.chatgpt_forecast_live(model_version=model)
+            preprocessed = chatgpt.chatgpt_forecast_live(model_version=model)
+            processed = [f.updated({'mode': modell}) for f in preprocessed]
+            forecast = processed
         except Exception as e:
             return str(e)
     forecast = pd.concat(forecast)

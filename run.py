@@ -57,8 +57,8 @@ async def get_live_storms() -> List[StormData]:
         storm['wind_speed_kph'] = int(storm['wind_speed']) * 1.15078
     return storms
 
-@app.get("/chatgpt_forecast_storm_live")
-def chatgpt_forecast_storm_live(model='all'):
+@app.get("/forecast-live-storms")
+def forecast_live_storms(model='all'):
     """
     Get a weather storm forecast using different versions of OpenAI's GPT models.
 
@@ -107,7 +107,7 @@ def chatgpt_forecast_storm_live(model='all'):
             forecast = processed
         except Exception as e:
             return str(e)
-    forecast = pd.concat(forecast)
+    forecast = pd.DataFrame(forecast)
     cache['forecasts'] = forecast.to_dict(orient="records")
     return cache['forecasts']
 

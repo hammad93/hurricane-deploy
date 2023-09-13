@@ -59,10 +59,34 @@ async def get_live_storms() -> List[StormData]:
 
 @app.get("/chatgpt_forecast_storm_live")
 def chatgpt_forecast_storm_live(model='all'):
-    '''
-    We utilize the chat completion from OpenAI and prompt for forecasts
-    one storm at a time.
-    '''
+    """
+    Get a weather storm forecast using different versions of OpenAI's GPT models.
+
+    This FastAPI endpoint uses the chat completion feature from OpenAI to forecast weather storms.
+    It can either use a single specified model or a list of pre-defined models to get multiple forecasts.
+
+    Parameters:
+    -----------
+    model : str, optional
+        The specific GPT model to use for the forecast. 
+        Default is 'all', which uses all available models ['gpt-3.5-turbo', 'gpt-4'].
+    
+    Returns:
+    --------
+    list[dict]
+        A list of forecast data as dictionaries. Each dictionary contains the forecast information and
+        the model used for that particular forecast. 
+
+    Raises:
+    -------
+    HTTPException:
+        If an error occurs while fetching or processing the forecast data.
+        
+    Notes:
+    ------
+    - Uses a global `cache` dictionary to store the forecast data.
+    - Fetches current live storms to feed into the language models for forecasting.
+    """
     global cache
     # Generate all available forecasts from the framework
     if model == 'all' :

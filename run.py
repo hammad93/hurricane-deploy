@@ -102,7 +102,10 @@ def forecast_live_storms(model='all'):
             preprocessed = pd.concat(preprocessed)
             preprocessed['model'] = _model
             print(preprocessed.head())
-            preprocessed = preprocessed.to_dict(orient="records")
+            # finish prepropossing by transforming to final data structure
+            # list of dict's
+            processed = preprocessed.to_dict(orient="records")
+            # note that we use extend to reduce dimensionality of data model
             forecast.extend(processed)
         except Exception as e:
             return traceback.print_exc()

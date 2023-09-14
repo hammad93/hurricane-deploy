@@ -112,22 +112,12 @@ def forecast_live_storms(model='all'):
     cache['forecasts'] = forecast
     return cache['forecasts']
 
-@app.get("/chatgpt_forecast_live_singular")
-def chatgpt_forecast_live_singular(model='gpt-3.5-turbo'):
-    '''
-    Ask the LLM to forecast for a single forecast time.
-    '''
-    global cache
-    try :
-        result = chatgpt.chatgpt_reflection_forecast_concurrent(model=model)
-    except Exception as e :
-        result = e
-    cache['forecasts'] = result
-    print(result)
-    return result
 
 @app.get('/forecasts')
 def forecasts():
+    '''
+    Provides the last generated forecast in the cache.
+    '''
     global cache
     return cache['forecasts']
 

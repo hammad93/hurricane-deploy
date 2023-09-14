@@ -7,6 +7,7 @@ import config
 import db
 import hurricane_net_chatgpt as chatgpt
 import pandas as pd
+import traceback
 import os
 
 app = FastAPI(
@@ -99,14 +100,14 @@ def forecast_live_storms(model='all'):
                 processed = [f.update({'model': _model}) for f in preprocessed]
                 forecast.extend(processed)
             except Exception as e:
-                return str(e)
+                return traceback.print_exc()
     else :
         try:
             preprocessed = chatgpt.chatgpt_forecast_live(model_version=model)
-            processed = [f.updated({'mode': modell}) for f in preprocessed]
+            processed = [f.updated({'model': model}) for f in preprocessed]
             forecast = processed
         except Exception as e:
-            return str(e)
+            return traceback.print_exc()
     forecast = pd.DataFrame(forecast)
     cache['forecasts'] = forecast.to_dict(orient="records")
     return cache['forecasts']

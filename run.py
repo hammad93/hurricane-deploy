@@ -92,24 +92,19 @@ def forecast_live_storms(model='all'):
     # Generate all available forecasts from the framework
     if model == 'all' :
         available_models = ['gpt-3.5-turbo', 'gpt-4']
-        forecast = []
-        for _model in available_models :
-            try:
-                # We use the script to get current live storms and feed it into the LLM
-                preprocessed = chatgpt.chatgpt_forecast_live(model_version=_model)
-                processed = [f.update({'model': _model}) for f in preprocessed]
-                forecast.extend(processed)
-            except Exception as e:
-                return traceback.print_exc()
     else :
+        available_models = [model]
+    forecast = []
+    for _model in available_models :
         try:
-            preprocessed = chatgpt.chatgpt_forecast_live(model_version=model)
-            processed = [f.updated({'model': model}) for f in preprocessed]
-            forecast = processed
+            # We use the script to get current live storms and feed it into the LLM
+            preprocessed = chatgpt.chatgpt_forecast_live(model_version=_model)
+            preprocessed = pd.concat(preprocessed).to_dict(orient="records")
+            processed = [f.update({'model': _model}) for f in preprocessed]
+            forecast.extend(processed)
         except Exception as e:
             return traceback.print_exc()
-    forecast = pd.DataFrame(forecast)
-    cache['forecasts'] = forecast.to_dict(orient="records")
+    cache['forecasts'] = forecast
     return cache['forecasts']
 
 @app.get("/chatgpt_forecast_live_singular")

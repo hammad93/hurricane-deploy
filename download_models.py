@@ -33,7 +33,4 @@ def download_model(url) :
     
 if __name__ == "__main__":
     download_model(config.forecast_model)
-    
-    # Download ChatGPT in the same way
-    os.system(f"wget {config.forecast_chatgpt} -P {os.path.abspath(os.path.dirname(__file__))}")
 

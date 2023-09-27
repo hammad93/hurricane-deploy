@@ -1,6 +1,3 @@
-config = {
-    'api_url' : 'http://fluids.ai:1337/'
-}
 from string import Template
 from datetime import timedelta
 import dateutil
@@ -11,6 +8,7 @@ import pandas as pd
 import openai
 import json
 import os
+import config
 
 def chatgpt_reflection_forecast_concurrent(model='gpt-3.5-turbo'):
   # get the live storms first

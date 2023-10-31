@@ -244,6 +244,10 @@ def chatgpt_forecast(prompt, model_version, retries=10):
     Returns
     -------
     pd.DataFrame
+
+    References
+    ----------
+    https://learn.microsoft.com/en-us/azure/ai-services/openai/quickstart?tabs=command-line&pivots=programming-language-python
     '''
     openai.api_type = "azure"
     openai.api_version = "2023-05-15" 

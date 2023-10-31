@@ -244,6 +244,10 @@ def chatgpt_forecast(prompt, model_version = "gpt-3.5-turbo", retries=10):
     Returns
     -------
     pd.DataFrame
+
+    References
+    ----------
+    https://learn.microsoft.com/en-us/azure/ai-services/openai/quickstart?tabs=command-line&pivots=programming-language-python
     '''
     openai.api_type = "azure"
     openai.api_version = "2023-05-15" 
@@ -251,7 +255,7 @@ def chatgpt_forecast(prompt, model_version = "gpt-3.5-turbo", retries=10):
     openai.api_key = os.getenv('OPENAI_API_KEY')
     while retries > 0 :
         response = openai.ChatCompletion.create(
-            model=model_version,
+            engine=model_version,
             messages=[
                     {"role": "system", "content": "Please act as a forecaster and a helpful assistant. Responses should be based on historical data and forecasts must be as accurate as possible."},
                     {"role": "user", "content": prompt},

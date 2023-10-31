@@ -281,7 +281,7 @@ def get_live_storms():
         The records include the columns id, time, lat, lon, wind_speed
     '''
     # make the request for live data
-    response = requests.get(f"{config['api_url']}live-storms")
+    response = requests.get(f"{config.api_url}live-storms")
     if response :
         data = response.json()
     else :

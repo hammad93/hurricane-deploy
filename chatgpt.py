@@ -227,7 +227,7 @@ def chatgpt_forecast_live(model_version = "gpt-35-turbo"):
                                     [(prompt, model_version) for prompt in prompts]))
     return forecasts
 
-def chatgpt_forecast(prompt, model_version = "gpt-3.5-turbo", retries=10):
+def chatgpt_forecast(prompt, model_version, retries=10):
     '''
     Given the prompt, this will pass it to the version of ChatGPT defined.
     It's meant for forecasts of global tropical storms but can have a range of options.
@@ -251,7 +251,7 @@ def chatgpt_forecast(prompt, model_version = "gpt-3.5-turbo", retries=10):
     openai.api_key = os.getenv('OPENAI_API_KEY')
     while retries > 0 :
         response = openai.ChatCompletion.create(
-            model=model_version,
+            engine=model_version,
             messages=[
                     {"role": "system", "content": "Please act as a forecaster and a helpful assistant. Responses should be based on historical data and forecasts must be as accurate as possible."},
                     {"role": "user", "content": prompt},

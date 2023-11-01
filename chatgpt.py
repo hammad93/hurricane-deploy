@@ -47,11 +47,15 @@ def storm_forecast_prompts_sequentially(data, hours = [6, 12, 24, 48, 72, 96, 12
 
 def msg_to_obj(text, delimiters = ('{', '}')):
   # Find the indices of the first and last curly braces in the text
-  start_index = text.find(delimiters[0])
-  end_index = text.rfind(delimiters[1])
+  if delimiters == '```':
+      start_index = text.find(delimiters[0] + 3)
+      end_index = text.rfind(delimiters[1])
+  else :
+      start_index = text.find(delimiters[0])
+      end_index = text.rfind(delimiters[1] + 1)
 
   # Extract the JSON string from the text
-  json_string = text[start_index:end_index+1]
+  json_string = text[start_index:end_index]
   return json_string
 
 def chatgpt_forecast_live(model_version):
@@ -123,7 +127,7 @@ def transform_chatgpt_forecasts(text, latest_time):
     Cleans the response from ChatGPT
     '''
     # the current data structure is a list of dictionaries
-    json_object = json.loads(msg_to_obj(text, delimiters = ('[', ']')))
+    json_object = json.loads(msg_to_obj(text, delimiters = '```'))
     result = [forecast.update(
       {
         'time' : dateutil.parser.parse(latest_time) + datetime.timedelta(hours = forecast['forecast'])
@@ -179,7 +183,7 @@ The response will be a list of JSON objects with these attributes:
     "lon" which is the predicted longitude WGS 84
     "wind_speed" which is the predicted maximum sustained wind speed in knots.
 There should be {len(forecast_times)} JSON objects in this list each corresponding to the forecast times {str(forecast_times)} hours in the future.
-It is required to format the response with the forecast JSON first, with comments after due to concerns with our delimiters.
+Please delimit the JSON response with ``` before and after the data.
 
 Table 1.
 - The wind_speed column is in knots representing the maxiumum sustained wind speeds.

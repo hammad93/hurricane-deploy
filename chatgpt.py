@@ -45,10 +45,10 @@ def storm_forecast_prompts_sequentially(data, hours = [6, 12, 24, 48, 72, 96, 12
         for hour in hours
   ]
 
-def msg_to_json(text):
+def msg_to_obj(text, delimiters = ('{', '}')):
   # Find the indices of the first and last curly braces in the text
-  start_index = text.find('{')
-  end_index = text.rfind('}')
+  start_index = text.find(delimiters[0])
+  end_index = text.rfind(delimiters[1])
 
   # Extract the JSON string from the text
   json_string = text[start_index:end_index+1]
@@ -120,6 +120,17 @@ def chatgpt_forecast(prompt, model_version, retries=10):
         except Exception as e:
             retries = retries - 1
             print(f"Retries left: {retries}, error message: {e}")
+def transform_chatgpt_forecasts(text, latest_time):
+    '''
+    Cleans the response from ChatGPT
+    '''
+    # the current data structure is a list of dictionaries
+    json_object = json.loads(msg_to_json(text, delimiters = ('[', ']')))
+    result = [forecast.update(
+      {
+        'time' : dateutil.parser.parse(lastest_time) + datetime.timedelta(hours = forecast['forecast'])
+      }) for forecast in json_object]
+    return result
 
 def get_live_storms():
     '''
@@ -141,7 +152,7 @@ def get_live_storms():
         return response
     return pd.DataFrame(data)
 
-def get_prompts(df, historical_limit = 5):
+def get_prompts(df, historical_limit = 5, forecast_times = [12, 24, 36, 48, 72]):
     '''
     Utilizing the current global tropical storms, we will generate prompts
     for a LLM such as ChatGPT to provide forecasts. This function will
@@ -161,16 +172,15 @@ def get_prompts(df, historical_limit = 5):
         current_storm = df[df['id'] == storm].drop(columns=['id']).sort_values(by='time', ascending=False)
         # because it's sorted by latest, it's the first row
         current_storm_latest = current_storm.iloc[0]['time']
-        forecast_times = '12, 24, 36, 48, and 72'
         prompt = f'''
-Please provide forecasts for {forecast_times} hours in the future from the most recent time in Table 1.
+Please provide forecasts for {str(forecast_times)} hours in the future from the most recent time in Table 1.
 These forecasts should be based on historical knowledge which includes but is not limited to storms with similar tracks and intensities, time of year of the storm, geographical coordinates, and climate change that may have occured since your previous training.
 The response will be a list of JSON objects with these attributes:
     "forecast" which is the hour ahead you're forecasting as an integer, e.g. 12 for 12 hours in the future
     "lat" which is the predicted latitude
     "lon" which is the predicted longitude
     "wind_speed" which is the predicted maximum sustained wind speed in knots.
-There should be 5 JSON objects in this list each corresponding to the forecast times {forecast_times} hours in the future.
+There should be {len(forecast_times)} JSON objects in this list each corresponding to the forecast times {str(forecast_times)} hours in the future.
 All coordinates are decimal degrees and follow WGS 84.
 
 Table 1.

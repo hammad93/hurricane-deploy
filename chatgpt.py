@@ -54,7 +54,7 @@ def msg_to_json(text):
   json_string = text[start_index:end_index+1]
   return json_string
 
-def chatgpt_forecast_live(model_version = "gpt-35-turbo"):
+def chatgpt_forecast_live(model_version):
     '''
     This will pull in the live storms across the globe and engineer
     prompts that will allow us to ingest forecasts from ChatGPT

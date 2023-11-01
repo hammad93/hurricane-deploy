@@ -66,7 +66,8 @@ def chatgpt_forecast_live(model_version):
     '''
     # get the current live tropical storms around the globe
     live_storms = get_live_storms()
-    prompts = get_prompts(live_storms)
+    live_storms_cleaned = live_storms.drop(columns=['wind_speed_mph', 'wind_speed_kph'])
+    prompts = get_prompts(live_storms_cleaned)
     # capture the forecast from ChatGPT
     # do this concurrently because each prompt is independent
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -175,7 +176,7 @@ The wind_speed column is in knots representing the maximum sustained wind speeds
 The lat and lon are the geographic coordinates in decimal degrees.
 
 In JSON,
-{df[df['id'] == storm].to_json()}
+{df[df['id'] == storm].to_json(indent=2, orient='records')}
         '''
         prompts.append(prompt)
         print(prompt)

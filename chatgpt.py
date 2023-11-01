@@ -106,7 +106,7 @@ def chatgpt_forecast(prompt, model_version, retries=10):
             engine=model_version,
             messages=[
                     {"role": "system", "content": "Please act as an expert forecaster and a helpful assistant. Responses should be based on historical data and forecasts must be as accurate as possible. Provided are live data from official source including NOAA and NASA."},
-                    {"role": "user", "content": prompt},
+                    {"role": "user", "content": prompt[0]},
                 ]
             )
         text = response["choices"][0]["message"]["content"]

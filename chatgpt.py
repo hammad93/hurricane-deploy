@@ -48,11 +48,11 @@ def storm_forecast_prompts_sequentially(data, hours = [6, 12, 24, 48, 72, 96, 12
 def msg_to_obj(text, delimiters = ('{', '}')):
   # Find the indices of the first and last curly braces in the text
   if delimiters == '```':
-      start_index = text.find(delimiters[0] + 3)
+      start_index = text.find(delimiters[0]) + 3
       end_index = text.rfind(delimiters[1])
   else :
       start_index = text.find(delimiters[0])
-      end_index = text.rfind(delimiters[1] + 1)
+      end_index = text.rfind(delimiters[1]) + 1
 
   # Extract the JSON string from the text
   json_string = text[start_index:end_index]

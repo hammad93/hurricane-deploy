@@ -141,7 +141,7 @@ def get_live_storms():
         return response
     return pd.DataFrame(data)
 
-def get_prompts(df):
+def get_prompts(df, historical_limit = 5):
     '''
     Utilizing the current global tropical storms, we will generate prompts
     for a LLM such as ChatGPT to provide forecasts. This function will
@@ -151,33 +151,39 @@ def get_prompts(df):
     ------
     df pd.DataFrame
         The records include the columns id, time, lat, lon, wind_speed.
+    historical_limit int
+        When creating the prompts, this limits the historical limits.
     '''
     unique_storms = set(df['id'])
     prompts = []
     # apply each storm to the prompt template
     for storm in unique_storms:
+        current_storm = df[df['id'] == storm].drop(columns=['id']).sort_values(by='time', ascending=False)
+        # because it's sorted by latest, it's the first row
+        current_storm_latest = current_storm.iloc[0]['time']
+        forecast_times = '12, 24, 36, 48, and 72'
         prompt = f'''
-I want you to act like a forecaster who gives a general idea of the future of the storm even though it will not be an official forecast.
-Please provide forecasts for 12, 24, 36, 48, and 72 hours in the future from the most recent time in Figure 1.
-The response will be JSON formatted with "forecasts" as the only key. The value of the key is a list of forecast objects.
-Each forecast object has five attributes:
-    "id" which identifies the storm
-    "time" which is the predicted time in ISO 8601 format
-    "lat" which is the predicted latitude in decimal degrees
-    "lon" which is the predicted longitude in decimal degrees
+Please provide forecasts for {forecast_times} hours in the future from the most recent time in Table 1.
+These forecasts should be based on historical knowledge which includes but is not limited to storms with similar tracks and intensities, time of year of the storm, geographical coordinates, and climate change that may have occured since your previous training.
+The response will be a list of JSON objects with these attributes:
+    "forecast" which is the hour ahead you're forecasting as an integer, e.g. 12 for 12 hours in the future
+    "lat" which is the predicted latitude
+    "lon" which is the predicted longitude
     "wind_speed" which is the predicted maximum sustained wind speed in knots.
-The response must be in JSON format, and the JSON characters must be at the beginning of the response.
-If you wish to add additional comments, it must be after the JSON data. Avoid the following common mistakes,
-- Responding with some variation of the track input.
-- Not responding in the appropriate time steps.
+There should be 5 JSON objects in this list each corresponding to the forecast times {forecast_times} hours in the future.
+All coordinates are decimal degrees and follow WGS 84.
 
-Figure 1. The historical records include columns representing measurements for storm {storm}.
-The wind_speed column is in knots representing the maximum sustained wind speeds.
-The lat and lon are the geographic coordinates in decimal degrees.
-
+Table 1.
+- The wind_speed column is in knots representing the maxiumum sustained wind speeds.
+- The lat and lon are the geographic coordinates
+- time is sorted and the most recent time is the first entry.
+- We have limited the history to {historical_limit} records.
 In JSON,
-{df[df['id'] == storm].to_json(indent=2, orient='records')}
+{current_storm.head(historical_limit).to_json(indent=2, orient='records')}
         '''
-        prompts.append(prompt)
+        prompts.append((prompt, {
+          'latest_time': current_storm_latest,
+          'forecast_times': forecast_times
+        }))
         print(prompt)
     return prompts

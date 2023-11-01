@@ -126,7 +126,7 @@ def transform_chatgpt_forecasts(text, latest_time):
     json_object = json.loads(msg_to_obj(text, delimiters = ('[', ']')))
     result = [forecast.update(
       {
-        'time' : dateutil.parser.parse(lastest_time) + datetime.timedelta(hours = forecast['forecast'])
+        'time' : dateutil.parser.parse(latest_time) + datetime.timedelta(hours = forecast['forecast'])
       }) for forecast in json_object]
     return result
 
@@ -175,17 +175,18 @@ Please provide forecasts for {str(forecast_times)} hours in the future from the 
 These forecasts should be based on historical knowledge which includes but is not limited to storms with similar tracks and intensities, time of year of the storm, geographical coordinates, and climate change that may have occured since your previous training.
 The response will be a list of JSON objects with these attributes:
     "forecast" which is the hour ahead you're forecasting as an integer, e.g. 12 for 12 hours in the future
-    "lat" which is the predicted latitude
-    "lon" which is the predicted longitude
+    "lat" which is the predicted latitude WGS 84
+    "lon" which is the predicted longitude WGS 84
     "wind_speed" which is the predicted maximum sustained wind speed in knots.
 There should be {len(forecast_times)} JSON objects in this list each corresponding to the forecast times {str(forecast_times)} hours in the future.
-All coordinates are decimal degrees and follow WGS 84.
+It is required to format the response with the forecast JSON first, with comments after due to concerns with our delimiters.
 
 Table 1.
 - The wind_speed column is in knots representing the maxiumum sustained wind speeds.
 - The lat and lon are the geographic coordinates
 - time is sorted and the most recent time is the first entry.
 - We have limited the history to {historical_limit} records.
+- All coordinates are decimal degrees and follow WGS 84.
 In JSON,
 {current_storm.head(historical_limit).to_json(indent=2, orient='records')}
         '''

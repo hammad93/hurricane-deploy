@@ -48,14 +48,15 @@ def storm_forecast_prompts_sequentially(data, hours = [6, 12, 24, 48, 72, 96, 12
 def msg_to_obj(text, delimiters = ('{', '}')):
   # Find the indices of the first and last curly braces in the text
   if delimiters == '```':
-      start_index = text.find(delimiters[0]) + 3
-      end_index = text.rfind(delimiters[1])
+      start_index = text.find(delimiters) + 3
+      end_index = text.rfind(delimiters)
   else :
       start_index = text.find(delimiters[0])
       end_index = text.rfind(delimiters[1]) + 1
 
   # Extract the JSON string from the text
   json_string = text[start_index:end_index]
+  print(json_string)
   return json_string
 
 def chatgpt_forecast_live(model_version):
@@ -117,7 +118,7 @@ def chatgpt_forecast(prompt, model_version, retries=10):
         print(text)
         # Parse the JSON string into a Python object
         try:
-            cleaned = transform_chatgpt_forecasts(text, prompt[1])
+            cleaned = transform_chatgpt_forecasts(text, prompt[1]['latest_time'])
             return pd.DataFrame(cleaned)
         except Exception as e:
             retries = retries - 1
@@ -128,10 +129,11 @@ def transform_chatgpt_forecasts(text, latest_time):
     '''
     # the current data structure is a list of dictionaries
     json_object = json.loads(msg_to_obj(text, delimiters = '```'))
-    result = [forecast.update(
+    result = [
       {
-        'time' : dateutil.parser.parse(latest_time) + datetime.timedelta(hours = forecast['forecast'])
-      }) for forecast in json_object]
+        **forecast,
+        'time' : dateutil.parser.parse(latest_time) + timedelta(hours = forecast['forecast'])
+      } for forecast in json_object]
     return result
 
 def get_live_storms():

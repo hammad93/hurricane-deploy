@@ -100,8 +100,10 @@ def forecast_live_storms(model='all'):
         try:
             # We use the script to get current live storms and feed it into the LLM
             preprocessed = chatgpt.chatgpt_forecast_live(model_version=_model)
-            preprocessed = pd.concat(preprocessed)
-            preprocessed['model'] = _model
+            if _model == 'live' :
+                preprocessed['model'] = 'gpt-35-turbo'
+            else:    
+                preprocessed['model'] = _model
             print(preprocessed.head())
             # finish prepropossing by transforming to final data structure
             # list of dict's

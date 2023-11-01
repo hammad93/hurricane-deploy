@@ -203,7 +203,7 @@ def update_global_hwrf():
     # read in table from link, this is the only (first) table
     update_table = pd.read_html(config['url'])[0]
     # get relevant table
-    update_table['timestamp'] = [time.timestamp() for time in pd.to_datetime(update_table[config['time_column']])]
+    update_table['timestamp'] = [time.timestamp() for time in pd.to_datetime(update_table[config['time_column']], utc=True)]
     # the table has many entries, so we only parse the most recent one
     # according to the frequency. We use the most recent in a day
     timestamp_threshold = datetime.now().timestamp() - (config['freq'] * 4)
@@ -223,12 +223,12 @@ def update_global_hwrf():
     filtered_links = [link for link in links if link.split('/')[-1][0] == 'b']
     # for each link, download it and append to an array
     column_names = config['column_names'] + [f'unk_{i + 1}' for i in range(config['column_buffer'])]
-    active_storms = pd.concat([pd.read_csv(link, names=column_names) for link in filtered_links],
+    active_storms = pd.concat([pd.read_csv(link, names=column_names, engine='python') for link in filtered_links],
         ignore_index = True)
     # trim buffered columns
     active_storms = active_storms.dropna(axis=1, how='all')
     # change data types of columns
-    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('US/Eastern')) for time in active_storms['time']]
+    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in active_storms['time']]
     def process_coord(c):
         '''
         The coordinates in the files are in a different 

@@ -91,7 +91,8 @@ def forecast_live_storms(model='all'):
     global cache
     # Generate all available forecasts from the framework
     if model == 'all' :
-        available_models = ['gpt-35-turbo', 'gpt-4']
+        #available_models = ['gpt-35-turbo', 'gpt-4']
+        available_models = ['live']
     else :
         available_models = [model]
     forecast = []

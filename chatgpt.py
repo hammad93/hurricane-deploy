@@ -113,10 +113,8 @@ def chatgpt_forecast(prompt, model_version, retries=10):
         print(text)
         # Parse the JSON string into a Python object
         try:
-            json_object = json.loads(msg_to_json(text))
-            # Extract the relevant information from the object
-            forecasts = json_object['forecasts']
-            return pd.DataFrame(forecasts)
+            cleaned = transform_chatgpt_forecasts(text, prompt[1])
+            return pd.DataFrame(cleaned)
         except Exception as e:
             retries = retries - 1
             print(f"Retries left: {retries}, error message: {e}")
@@ -125,7 +123,7 @@ def transform_chatgpt_forecasts(text, latest_time):
     Cleans the response from ChatGPT
     '''
     # the current data structure is a list of dictionaries
-    json_object = json.loads(msg_to_json(text, delimiters = ('[', ']')))
+    json_object = json.loads(msg_to_obj(text, delimiters = ('[', ']')))
     result = [forecast.update(
       {
         'time' : dateutil.parser.parse(lastest_time) + datetime.timedelta(hours = forecast['forecast'])

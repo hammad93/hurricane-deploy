@@ -105,7 +105,7 @@ def chatgpt_forecast(prompt, model_version, retries=10):
         response = openai.ChatCompletion.create(
             engine=model_version,
             messages=[
-                    {"role": "system", "content": "Please act as a forecaster and a helpful assistant. Responses should be based on historical data and forecasts must be as accurate as possible."},
+                    {"role": "system", "content": "Please act as an expert forecaster and a helpful assistant. Responses should be based on historical data and forecasts must be as accurate as possible. Provided are live data from official source including NOAA and NASA."},
                     {"role": "user", "content": prompt},
                 ]
             )

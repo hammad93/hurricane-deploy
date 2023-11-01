@@ -78,7 +78,7 @@ def chatgpt_forecast_live(model_version):
     with concurrent.futures.ThreadPoolExecutor() as executor:
       forecasts = list(executor.map(lambda p: chatgpt_forecast(*p),
                                     [(prompt, model_version) for prompt in prompts]))
-    return pd.concat(forecasts, ignore_index=True)
+    return pd.concat(forecasts, ignore_index=True).drop(columns=['forecast'])
 
 def chatgpt_forecast(prompt, model_version, retries=10):
     '''

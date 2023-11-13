@@ -11,6 +11,11 @@ def setup():
   os.environ["OPENAI_API_KEY"] = passwords[passwords['user'] == 'openai'].iloc[0]['pass']
   os.environ["OPENAI_API_BASE"] = passwords[passwords['user'] == 'openai'].iloc[0]['host']
 
+  # https://learn.microsoft.com/en-us/azure/developer/python/sdk/authentication-on-premises-apps
+  os.environ['AZURE_CLIENT_ID'] = passwords[passwords['user'] == 'azure_client'].iloc[0]['pass']
+  os.environ['AZURE_TENANT_ID'] = passwords[passwords['user'] == 'azure_tenant'].iloc[0]['pass']
+  os.environ['AZURE_CLIENT_SECRET'] = passwords[passwords['user'] == 'azure_key'].iloc[0]['pass']
+
 
 def chatgpt_reflection_forecast_concurrent(model='gpt-3.5-turbo'):
   # get the live storms first

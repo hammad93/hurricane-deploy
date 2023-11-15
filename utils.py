@@ -22,7 +22,7 @@ def run_tts():
   # Azure Resource Details
   subscription_id = '6fabfb83-efda-4669-a00e-8c928dcd4b18'
   resource_group = 'jupyter-lab_group'
-  container_group_name = f'huraim_{int(time.time())}'
+  container_group_name = f'tts{int(time.time())}'
   image_id = "huraim.azurecr.io/hurricane-tts:latest"
   
   # Azure REST API Endpoint

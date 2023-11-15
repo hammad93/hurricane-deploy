@@ -158,6 +158,36 @@ def latest_tts():
         raise HTTPException(status_code=500, detail=str(e))
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="Error decoding JSON data from Redis")
+
+@app.get('/get-audio/{filename}', response_class=Response)
+def get_audio(filename: str):
+    """
+    Retrieve an audio file in .wav format.
+
+    This endpoint queries the Redis database to fetch an audio file based on
+    the provided filename. The filename is used as the key in Redis.
+
+    Parameters:
+        filename (str): The filename of the audio file to retrieve.
+
+    Returns:
+        Response: A response object containing the audio file in binary format.
+
+    Raises:
+        HTTPException: If there is an error in fetching the audio file from Redis
+        or if the file is not found.
+    """
+    try:
+        r = db.redis_client()
+        audio_data = r.get(filename)
+        if audio_data is None:
+            raise HTTPException(status_code=404, detail="Audio file not found")
+
+        return Response(content=audio_data, media_type="audio/wav")
+    except redis.RedisError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     # set things up according to tests
     test.setup()

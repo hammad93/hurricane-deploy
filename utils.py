@@ -55,7 +55,8 @@ def run_tts():
                 "username": "huraim",  # Replace with your registry username
                 "password": acr_secret  # Replace with your registry password
             }
-        ]
+        ],
+        "restartPolicy": "Never"  # Set the restart policy to Never
       }
   }
   

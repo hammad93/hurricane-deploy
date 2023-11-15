@@ -9,6 +9,7 @@ import chatgpt
 import pandas as pd
 import traceback
 import os
+import redis
 import test
 
 app = FastAPI(

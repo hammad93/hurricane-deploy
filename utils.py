@@ -41,7 +41,7 @@ def run_tts():
                       "image": image_id,
                       "resources": {
                           "requests": {
-                              "cpu": 4,
+                              "cpu": 2,
                               "memoryInGb": 8
                           }
                       }

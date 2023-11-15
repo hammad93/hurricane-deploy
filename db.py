@@ -1,7 +1,20 @@
 from sqlalchemy import create_engine
 import pandas as pd
 import config
+import redis
+import os
+import json
+import test
 
+def redis_client():
+    '''
+    Returns the client based on current configurations
+    '''
+    test.setup()
+    return redis.StrictRedis(host = config.redis_host,
+                          password = os.environ['AZURE_REDIS_KEY'],
+                          port = config.redis_port,
+                          ssl = True)
 
 def connection_string(database):
     '''

@@ -8,14 +8,19 @@ def setup():
   production
   '''
   passwords = pd.read_csv(config.credentials_dir)
-  os.environ["OPENAI_API_KEY"] = passwords[passwords['user'] == 'openai'].iloc[0]['pass']
-  os.environ["OPENAI_API_BASE"] = passwords[passwords['user'] == 'openai'].iloc[0]['host']
+  def get_var(var, col):
+    return passwords[passwords['user'] == var].iloc[0][col]
+  os.environ["OPENAI_API_KEY"] = get_var('openai', 'pass')
+  os.environ["OPENAI_API_BASE"] = get_var('openai', 'host')
 
   # https://learn.microsoft.com/en-us/azure/developer/python/sdk/authentication-on-premises-apps
-  os.environ['AZURE_CLIENT_ID'] = passwords[passwords['user'] == 'azure_client'].iloc[0]['pass']
-  os.environ['AZURE_TENANT_ID'] = passwords[passwords['user'] == 'azure_tenant'].iloc[0]['pass']
-  os.environ['AZURE_CLIENT_SECRET'] = passwords[passwords['user'] == 'azure_key'].iloc[0]['pass']
-  os.environ['AZURE_CONTAINER_REGISTRY_PWD'] = passwords[passwords['user'] == 'acr_key'].iloc[0]['pass']
+  os.environ['AZURE_CLIENT_ID'] = get_var('azure_client', 'pass')
+  os.environ['AZURE_TENANT_ID'] = get_var('azure_tenant', 'pass')
+  os.environ['AZURE_CLIENT_SECRET'] = get_var('azure_key', 'pass')
+  os.environ['AZURE_CONTAINER_REGISTRY_PWD'] = get_var('acr_key', 'pass')
+  os.environ['AZURE_REDIS_KEY'] = get_var('redis', 'pass')
+  os.environ['AZURE_REDIS_HOST'] = get_var('redis', 'host')
+  os.environ['AZURE_REDIS_PORT'] = get_var('redis', 'port')
 
 
 def chatgpt_reflection_forecast_concurrent(model='gpt-3.5-turbo'):

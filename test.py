@@ -20,7 +20,7 @@ def setup():
   os.environ['AZURE_CONTAINER_REGISTRY_PWD'] = get_var('acr_key', 'pass')
   os.environ['AZURE_REDIS_KEY'] = get_var('redis', 'pass')
   os.environ['AZURE_REDIS_HOST'] = get_var('redis', 'host')
-  os.environ['AZURE_REDIS_PORT'] = get_var('redis', 'port')
+  os.environ['AZURE_REDIS_PORT'] = int(get_var('redis', 'port'))
 
 
 def chatgpt_reflection_forecast_concurrent(model='gpt-3.5-turbo'):

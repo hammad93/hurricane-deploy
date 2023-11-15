@@ -15,6 +15,7 @@ def setup():
   os.environ['AZURE_CLIENT_ID'] = passwords[passwords['user'] == 'azure_client'].iloc[0]['pass']
   os.environ['AZURE_TENANT_ID'] = passwords[passwords['user'] == 'azure_tenant'].iloc[0]['pass']
   os.environ['AZURE_CLIENT_SECRET'] = passwords[passwords['user'] == 'azure_key'].iloc[0]['pass']
+  os.environ['AZURE_CONTAINER_REGISTRY_PWD'] = passwords[passwords['user'] == 'acr_key'].iloc[0]['pass']
 
 
 def chatgpt_reflection_forecast_concurrent(model='gpt-3.5-turbo'):

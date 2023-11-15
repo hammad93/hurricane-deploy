@@ -11,6 +11,7 @@ import traceback
 import os
 import redis
 import test
+import json
 
 app = FastAPI(
     title="fluids API",

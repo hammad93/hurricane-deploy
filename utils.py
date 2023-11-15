@@ -87,3 +87,32 @@ def run_tts():
   
   # Output the result
   print(response.status_code, response.json())
+
+def web_screenshot(url = 'http://fluids.ai:7000/', out = 'screenshot.png'):
+  import time
+  from selenium import webdriver
+  from selenium.webdriver.chrome.options import Options
+  from selenium.webdriver.chrome.service import Service
+  from webdriver_manager.chrome import ChromeDriverManager
+  
+  # Configure Selenium options
+  options = Options()
+  options.add_argument('--headless')  # Run in headless mode for a headless machine
+  options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
+  options.add_argument('--disable-gpu')  # Disable GPU hardware acceleration
+  options.add_argument('--no-sandbox')  # Bypass OS security model, required in some environments
+  
+  # Initialize the Chrome driver
+  driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+  
+  # Navigate to the url
+  driver.get(url)
+  
+  # Wait for the map to load fully. Adjust time as needed based on network speed and map complexity
+  time.sleep(10)  # Sleep for 10 seconds (or more if needed)
+  
+  # Take and save a screenshot
+  driver.save_screenshot(out)
+  
+  # Close the browser
+  driver.quit()

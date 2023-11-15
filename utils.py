@@ -1,7 +1,7 @@
-import test
-import requests
 import json
+import requests
 import os
+import test
 
 def run_tts():
   '''
@@ -16,12 +16,13 @@ def run_tts():
   tenant_id = os.environ['AZURE_TENANT_ID']
   client_id = os.environ['AZURE_CLIENT_ID']
   client_secret = os.environ['AZURE_CLIENT_SECRET']
+  acr_secret = os.environ['AZURE_CONTAINER_REGISTRY_PWD']
   
   # Azure Resource Details
   subscription_id = '6fabfb83-efda-4669-a00e-8c928dcd4b18'
   resource_group = 'jupyter-lab_group'
   container_group_name = 'huraim'
-  image_id = "huraim.azurecr.io/huraim"
+  image_id = "huraim.azurecr.io/hurricane-tts:latest"
   
   # Azure REST API Endpoint
   resource = "https://management.azure.com/"
@@ -47,7 +48,13 @@ def run_tts():
               }
           ],
           "osType": "Linux",
-          # Add more properties as needed
+          "imageRegistryCredentials": [
+            {
+                "server": "huraim.azurecr.io",  # Replace with your registry server
+                "username": "huraim",  # Replace with your registry username
+                "password": acr_secret  # Replace with your registry password
+            }
+        ]
       }
   }
   
@@ -78,4 +85,3 @@ def run_tts():
   
   # Output the result
   print(response.status_code, response.json())
-  return True

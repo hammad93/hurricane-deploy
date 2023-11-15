@@ -125,6 +125,33 @@ def forecasts():
     global cache
     return cache['forecasts']
 
+@app.get('/latest-tts', response_model=dict)
+def latest_tts():
+    """
+    Retrieve the latest text-to-speech (TTS) output.
+
+    This endpoint queries the Redis database to fetch the latest TTS output
+    based on a predefined key. The architecture involves retrieving a JSON
+    object stored in Redis, which contains the TTS data.
+
+    Returns:
+        dict: A dictionary containing the latest TTS output. The structure of
+        the returned JSON is determined by how the data is stored in Redis.
+
+    Raises:
+        HTTPException: If there is an error in fetching data from Redis or if
+        the data is not found.
+    """
+    try:
+        r = db.redis_client()
+        latest_key = config.redis_latest_audio_key
+        result = r.get(latest_key)
+        if result is None:
+            raise HTTPException(status_code=404, detail="Latest TTS data not found")
+        return {"data": result.decode('utf-8')}
+    except redis.RedisError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     # set things up according to tests
     test.setup()

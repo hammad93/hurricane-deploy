@@ -10,6 +10,7 @@ from email.mime.text import MIMEText
 import requests
 import config
 import os
+import utils
 
 # Setup logs
 logging.basicConfig(filename='report.log', level=logging.DEBUG)
@@ -154,6 +155,8 @@ if global_data['unique'] :
   forecasts = requests.get(config.chatgpt_forecast_api)
   print(forecasts.content)
   send_email()
+  # text to speech
+  utils.run_tts()
 else :
   print('Data ingested is not new.')
 

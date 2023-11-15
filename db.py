@@ -11,9 +11,9 @@ def redis_client():
     Returns the client based on current configurations
     '''
     test.setup()
-    return redis.StrictRedis(host = config.redis_host,
+    return redis.StrictRedis(host = os.environ['AZURE_REDIS_HOST'],
                           password = os.environ['AZURE_REDIS_KEY'],
-                          port = config.redis_port,
+                          port = os.environ['AZURE_REDIS_PORT'],
                           ssl = True)
 
 def connection_string(database):

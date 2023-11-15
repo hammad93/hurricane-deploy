@@ -4,6 +4,14 @@ import json
 import os
 
 def run_tts():
+  '''
+  Runs the container on the web service that generates and uploads the 
+  text to speech artificial intelligence through Azure.
+
+  https://github.com/Azure-Samples/azure-samples-python-management/blob/main/samples/containerinstance/manage_container_group.py
+  '''
+  test.setup() # setups up environment
+  
   # Azure Service Principal Credentials
   tenant_id = os.environ['AZURE_TENANT_ID']
   client_id = os.environ['AZURE_CLIENT_ID']
@@ -13,6 +21,7 @@ def run_tts():
   subscription_id = '6fabfb83-efda-4669-a00e-8c928dcd4b18'
   resource_group = 'jupyter-lab_group'
   container_group_name = 'huraim'
+  image_id = "huraim.azurecr.io/huraim"
   
   # Azure REST API Endpoint
   resource = "https://management.azure.com/"
@@ -27,7 +36,7 @@ def run_tts():
               {
                   "name": container_group_name,
                   "properties": {
-                      "image": "mcr.microsoft.com/azure-cli",
+                      "image": image_id,
                       "resources": {
                           "requests": {
                               "cpu": 4,

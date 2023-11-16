@@ -3,6 +3,7 @@ import requests
 import os
 import test
 import time
+import re
 
 def run_tts(timestamp=False):
     '''
@@ -93,7 +94,7 @@ def run_tts(timestamp=False):
         'request-response': response.json()
     }
 
-def manage_container(name):
+def manage_containers():
     # Azure Service Principal Credentials
     tenant_id = os.environ['AZURE_TENANT_ID']
     client_id = os.environ['AZURE_CLIENT_ID']
@@ -103,19 +104,30 @@ def manage_container(name):
     # Azure Resource Details
     subscription_id = '6fabfb83-efda-4669-a00e-8c928dcd4b18'
     resource_group = 'jupyter-lab_group'
-    container_group_name = name
     image_id = "huraim.azurecr.io/hurricane-tts:latest"
-
     token = get_access_token(tenant_id, client_id, client_secret)
-    genesus = time.time()
-    while (time.time() - genesus) < 99999: # seconds, roughly more than a day
-        status = request_container_status(subscription_id, resource_group, container_group_name, token)
-        print(f"Status: {status}, Elapsed: {time.time() - genesus} secs")
-        if status in ['Terminated', 'Succeeded', 'Failed']:  # Check for the relevant status
-            response_code = delete_container_instance(subscription_id, resource_group, container_group_name, token)
+
+    # list and select containers to delete
+    containers = list_container_instances(subscription_id, resource_group, token)
+    print(f"Containers: {containers}")
+    completed_containers = []
+    max_containers = 5
+    tts_regex = 'tts[0-9]+' # match container names
+    for container in containers:
+        status = request_container_status(subscription_id, resource_group, container, token)
+        if re.fullmatch(tts_regex, container) and status in ['Terminated', 'Succeeded', 'Failed']:  # Check for the relevant status
+            completed_containers.append(container)
+    
+    # delete conditions is FIFO on time, but if it's the same time, unknwon which it first deletes
+    if len(completed_containers) > max_containers:
+        # first in first out according to time, which is the unix time in the name
+        fifo = sorted(completed_containers, key = lambda name: re.search("[0-9]+", name).group())[:max_containers]
+        print(f"Select containers to delete: {fifo}")
+        # prune out containers
+        for container in fifo:
+            response_code = delete_container_instance(subscription_id, resource_group, container, token)
             print(f"Container instance deleted, response code: {response_code}")
-            break
-        time.sleep(60)  # Wait for 60 seconds before checking again
+
 
 def delete_container_instance(subscription_id, resource_group, container_group_name, token):
     url = f"https://management.azure.com/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.ContainerInstance/containerGroups/{container_group_name}?api-version=2021-07-01"
@@ -134,6 +146,15 @@ def request_container_status(subscription_id, resource_group, container_group_na
     }
     response = requests.get(url, headers=headers)
     return response.json().get('properties', {}).get('instanceView', {}).get('state')
+
+def list_container_instances(subscription_id, resource_group, token):
+    url = f"https://management.azure.com/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.ContainerInstance/containerGroups?api-version=2021-07-01"
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.get(url, headers=headers)
+    return response.json()
 
 def get_access_token(tenant_id, client_id, client_secret):
     '''

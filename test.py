@@ -13,8 +13,13 @@ def ai_pipeline():
   # chatgpt forecasts
   forecasts = requests.get(config.chatgpt_forecast_api)
   print(f'ChatGPT forecasts: {forecasts.content}')
+  
   # text to speech
-  utils.run_tts()
+  tts_metadata = utils.run_tts()
+  print(f'TTS Metadata: {tts_metadata}')
+
+  # cleanup pipeline run
+  utils.manage_containers()
 
 def setup():
   '''

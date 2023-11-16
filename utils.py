@@ -122,7 +122,7 @@ def manage_containers():
     # delete conditions is FIFO on time, but if it's the same time, unknwon which it first deletes
     if len(completed_containers) > max_containers:
         # first in first out according to time, which is the unix time in the name
-        fifo = sorted(completed_containers, key = lambda name: re.search("[0-9]+", name).group())[:max_containers]
+        fifo = sorted(completed_containers, key = lambda name: re.search("[0-9]+", name).group())[-max_containers:]
         print(f"Select containers to delete: {fifo}")
         # prune out containers
         for container in fifo:

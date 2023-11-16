@@ -93,7 +93,19 @@ def run_tts(timestamp=False):
         'request-response': response.json()
     }
 
-def get_container_status():
+def get_container_status(name):
+    # Azure Service Principal Credentials
+    tenant_id = os.environ['AZURE_TENANT_ID']
+    client_id = os.environ['AZURE_CLIENT_ID']
+    client_secret = os.environ['AZURE_CLIENT_SECRET']
+    acr_secret = os.environ['AZURE_CONTAINER_REGISTRY_PWD']
+
+    # Azure Resource Details
+    subscription_id = '6fabfb83-efda-4669-a00e-8c928dcd4b18'
+    resource_group = 'jupyter-lab_group'
+    container_group_name = name
+    image_id = "huraim.azurecr.io/hurricane-tts:latest"
+
     token = get_access_token(tenant_id, client_id, client_secret)
     genesus = time.time()
     while (time.time() - genesus) < 99999: # seconds, roughly more than a day

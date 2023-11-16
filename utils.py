@@ -93,7 +93,7 @@ def run_tts(timestamp=False):
         'request-response': response.json()
     }
 
-def get_container_status(name):
+def manage_container(name):
     # Azure Service Principal Credentials
     tenant_id = os.environ['AZURE_TENANT_ID']
     client_id = os.environ['AZURE_CLIENT_ID']
@@ -111,12 +111,10 @@ def get_container_status(name):
     while (time.time() - genesus) < 99999: # seconds, roughly more than a day
         status = request_container_status(subscription_id, resource_group, container_group_name, token)
         print(f"Status: {status}, Elapsed: {time.time() - genesus} secs")
-        '''
-        if status == 'Terminated':  # Check for the relevant status
+        if status in ['Terminated', 'Suceeded', 'Failed']:  # Check for the relevant status
             response_code = delete_container_instance(subscription_id, resource_group, container_group_name, token)
             print(f"Container instance deleted, response code: {response_code}")
             break
-        '''
         time.sleep(60)  # Wait for 60 seconds before checking again
 
 def request_container_status(subscription_id, resource_group, container_group_name, token):

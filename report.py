@@ -12,6 +12,7 @@ import config
 import os
 import utils
 import test
+import wp
 
 # Setup logs
 logging.basicConfig(filename='report.log', level=logging.DEBUG)
@@ -155,6 +156,11 @@ def send_email() :
 if global_data['unique'] :
   test.ai_pipeline()
   send_email()
+  top_of_the_hour = datetime.now().replace(minute=0, second=0, microsecond=0).strftime("%Y-%m-%d %H")
+  wp.create_post(
+    f'fluids Hourly Weather Report: {top_of_the_hour}00 Zulu',
+    BODY_HTML
+    )
 else :
   print('Data ingested is not new.')
 

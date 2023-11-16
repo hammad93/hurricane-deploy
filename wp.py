@@ -1,6 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import test
+import os
 
 def create_post(title, content, **kwargs):
     '''

@@ -108,11 +108,12 @@ def manage_containers():
     token = get_access_token(tenant_id, client_id, client_secret)
 
     # list and select containers to delete
-    containers = list_container_instances(subscription_id, resource_group, token)
-    print(f"Containers: {containers}")
-    completed_containers = []
+    containers_response = list_container_instances(subscription_id, resource_group, token)
+    print(f"Container list response: {containers_response}")
+    containers = [container['name'] for container in containers_response['value']]
     max_containers = 5
     tts_regex = 'tts[0-9]+' # match container names
+    completed_containers = []
     for container in containers:
         status = request_container_status(subscription_id, resource_group, container, token)
         if re.fullmatch(tts_regex, container) and status in ['Terminated', 'Succeeded', 'Failed']:  # Check for the relevant status

@@ -4,7 +4,7 @@ import os
 import test
 import time
 
-    def run_tts(timestamp=False):
+def run_tts(timestamp=False):
     '''
     Runs the container on the web service that generates and uploads the 
     text to speech artificial intelligence through Azure.

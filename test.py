@@ -1,6 +1,20 @@
 import config
 import pandas as pd
+import requests
 import os
+import utils
+
+def ai_pipeline():
+  '''
+  Starts and manages the processes with artificial intelligence including,
+  - Forecasts
+  - Text to speech
+  '''
+  # chatgpt forecasts
+  forecasts = requests.get(config.chatgpt_forecast_api)
+  print(f'ChatGPT forecasts: {forecasts.content}')
+  # text to speech
+  utils.run_tts()
 
 def setup():
   '''

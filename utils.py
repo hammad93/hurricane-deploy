@@ -109,7 +109,7 @@ def get_container_status(name):
     token = get_access_token(tenant_id, client_id, client_secret)
     genesus = time.time()
     while (time.time() - genesus) < 99999: # seconds, roughly more than a day
-        status = get_container_status(subscription_id, resource_group, container_group_name, token)
+        status = request_container_status(subscription_id, resource_group, container_group_name, token)
         print(f"Status: {status}, Elapsed: {time.time() - genesus} secs")
         if status == 'Terminated':  # Check for the relevant status
             response_code = delete_container_instance(subscription_id, resource_group, container_group_name, token)

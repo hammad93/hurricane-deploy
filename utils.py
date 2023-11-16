@@ -130,6 +130,7 @@ def get_access_token(tenant_id, client_id, client_secret):
     '''
     Get access token from Azure
     '''
+    resource = "https://management.azure.com/"
     url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/token"
     payload = {
         'grant_type': 'client_credentials',

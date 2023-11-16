@@ -117,6 +117,15 @@ def manage_container(name):
             break
         time.sleep(60)  # Wait for 60 seconds before checking again
 
+def delete_container_instance(subscription_id, resource_group, container_group_name, token):
+    url = f"https://management.azure.com/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.ContainerInstance/containerGroups/{container_group_name}?api-version=2021-07-01"
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(url, headers=headers)
+    return response.status_code
+
 def request_container_status(subscription_id, resource_group, container_group_name, token):
     url = f"https://management.azure.com/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.ContainerInstance/containerGroups/{container_group_name}?api-version=2021-07-01"
     headers = {

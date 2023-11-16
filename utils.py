@@ -111,7 +111,7 @@ def manage_container(name):
     while (time.time() - genesus) < 99999: # seconds, roughly more than a day
         status = request_container_status(subscription_id, resource_group, container_group_name, token)
         print(f"Status: {status}, Elapsed: {time.time() - genesus} secs")
-        if status in ['Terminated', 'Suceeded', 'Failed']:  # Check for the relevant status
+        if status in ['Terminated', 'Succeeded', 'Failed']:  # Check for the relevant status
             response_code = delete_container_instance(subscription_id, resource_group, container_group_name, token)
             print(f"Container instance deleted, response code: {response_code}")
             break

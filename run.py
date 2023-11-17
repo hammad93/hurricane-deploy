@@ -106,6 +106,7 @@ def forecast_live_storms(model='all'):
                 preprocessed['model'] = 'gpt-35-turbo'
             else:    
                 preprocessed['model'] = _model
+            preprocessed['time'] = preprocessed['time'].apply(lambda x: x.isoformat())
             print(preprocessed.head())
             # finish prepropossing by transforming to final data structure
             # list of dict's

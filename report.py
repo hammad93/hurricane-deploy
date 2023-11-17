@@ -152,11 +152,13 @@ def send_email() :
     print ("Error: ", e)
   else:
     print (f"Email sent to {RECIPIENTS}")
+  
+  return BODY_HTML
 
 if global_data['unique'] :
   test.ai_pipeline()
-  send_email()
-  top_of_the_hour = datetime.now().replace(minute=0, second=0, microsecond=0).strftime("%Y-%m-%d %H")
+  BODY_HTML = send_email()
+  top_of_the_hour = datetime.datetime.now().replace(minute=0, second=0, microsecond=0).strftime("%Y-%m-%d %H")
   wp.create_post(
     f'fluids Hourly Weather Report: {top_of_the_hour}00 Zulu',
     BODY_HTML

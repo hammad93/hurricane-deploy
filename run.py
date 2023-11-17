@@ -116,7 +116,7 @@ def forecast_live_storms(model='all'):
             return traceback.print_exc()
     # set in cache
     global r
-    r.set('forecasts', forecast)
+    r.set('forecasts', json.dumps(forecast))
     return r.get('forecasts')
 
 
@@ -126,7 +126,8 @@ def forecasts():
     Provides the last generated forecast in the cache.
     '''
     global r
-    return r.get('forecasts')
+    result = r.get('forecasts')
+    return json.loads(result)
 
 @app.get('/latest-tts', response_model=list)
 def latest_tts():

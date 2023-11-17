@@ -26,7 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-cache = {}
+r = db.redis_client()
 
 @app.get("/")
 def read_root():
@@ -91,7 +91,6 @@ def forecast_live_storms(model='all'):
     - Uses a global `cache` dictionary to store the forecast data.
     - Fetches current live storms to feed into the language models for forecasting.
     """
-    global cache
     # Generate all available forecasts from the framework
     if model == 'all' :
         #available_models = ['gpt-35-turbo', 'gpt-4']
@@ -115,8 +114,10 @@ def forecast_live_storms(model='all'):
             forecast.extend(processed)
         except Exception as e:
             return traceback.print_exc()
-    cache['forecasts'] = forecast
-    return cache['forecasts']
+    # set in cache
+    global r
+    r.set('forecasts', forecasts)
+    return r.get('forecasts')
 
 
 @app.get('/forecasts')
@@ -124,8 +125,8 @@ def forecasts():
     '''
     Provides the last generated forecast in the cache.
     '''
-    global cache
-    return cache['forecasts']
+    global r
+    return r.get('forecasts')
 
 @app.get('/latest-tts', response_model=list)
 def latest_tts():
@@ -145,7 +146,7 @@ def latest_tts():
         the data is not found.
     """
     try:
-        r = db.redis_client()
+        global r
         latest_key = config.redis_latest_audio_key
         result = r.get(latest_key)
         if result is None:
@@ -178,7 +179,7 @@ def get_audio(filename: str):
         or if the file is not found.
     """
     try:
-        r = db.redis_client()
+        global r
         audio_data = r.get(filename)
         if audio_data is None:
             raise HTTPException(status_code=404, detail="Audio file not found")

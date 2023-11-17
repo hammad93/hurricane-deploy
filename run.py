@@ -116,7 +116,7 @@ def forecast_live_storms(model='all'):
             return traceback.print_exc()
     # set in cache
     global r
-    r.set('forecasts', forecasts)
+    r.set('forecasts', forecast)
     return r.get('forecasts')
 
 

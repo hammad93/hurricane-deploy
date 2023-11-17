@@ -118,7 +118,7 @@ def forecast_live_storms(model='all'):
     # set in cache
     global r
     r.set('forecasts', json.dumps(forecast))
-    return r.get('forecasts')
+    return json.loads(r.get('forecasts'))
 
 
 @app.get('/forecasts')

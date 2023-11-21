@@ -182,9 +182,9 @@ def get_audio(filename: str):
     """
     try:
         # download audio first
-        db.download_file_s3(filename, config.s3_tts_bucket, config.audio_save_dir)
+        db.download_file_s3(filename, config.s3_tts_bucket, config.s3_tts_save_dir)
         # read in audio
-        with open(config.audio_save_dir + file_name, "rb") as f:
+        with open(config.s3_tts_save_dir + file_name, "rb") as f:
             audio_data = f.read()
         # respond as wav format
         return Response(content=audio_data, media_type="audio/wav")

@@ -41,6 +41,8 @@ def setup():
   os.environ['AZURE_REDIS_HOST'] = get_var('redis', 'host')
   os.environ['AZURE_REDIS_PORT'] = str(int(get_var('redis', 'port')))
   os.environ['WP_PASS'] = get_var('user', 'pass')
+  os.environ['AWS_ACCESS_KEY_ID'] = get_var('AWS_ACCESS_KEY_ID', 'pass')
+  os.environ['AWS_SECRET_ACCESS_KEY'] = get_var('AWS_SECRET_ACCESS_KEY', 'pass')
 
 
 def chatgpt_reflection_forecast_concurrent(model='gpt-3.5-turbo'):

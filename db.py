@@ -5,6 +5,26 @@ import redis
 import os
 import json
 import test
+import boto3
+
+
+def download_file_s3(file_name, bucket, path):
+  '''
+  Parameters
+  ----------
+  path string
+    In order to have space, we check if we have already downloaded it in this path
+   
+  '''
+  # check if we have already downloaded it and can pass the data
+  
+  full_path = path + file_name
+  if os.path.exists(full_path):
+     print('The file exists already')
+  else:
+     # download the file
+     s3 = boto3.client('s3')
+     s3.download_file(bucket, file_name, full_path)
 
 def redis_client():
     '''

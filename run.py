@@ -181,13 +181,14 @@ def get_audio(filename: str):
         or if the file is not found.
     """
     try:
-        global r
-        audio_data = r.get(filename)
-        if audio_data is None:
-            raise HTTPException(status_code=404, detail="Audio file not found")
-
+        # download audio first
+        db.download_file_s3(filename, config.s3_tts_bucket, config.audio_save_dir)
+        # read in audio
+        with open(config.audio_save_dir + file_name, "rb") as f:
+            audio_data = f.read()
+        # respond as wav format
         return Response(content=audio_data, media_type="audio/wav")
-    except redis.RedisError as e:
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 

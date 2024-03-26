@@ -4,3 +4,4 @@ uvicorn[standard]
 pymysql
 openai
 redis
+boto3

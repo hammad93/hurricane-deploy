@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
 import config
 import redis
@@ -57,7 +57,11 @@ def query(q, database = 'hurricane_live', write = False):
     if write :
         with get_engine(database).connect() as conn :
             print(q)
-            result = conn.execute(*q)
+            # check to see if query was a string
+            if type(q[0]) == str:
+                result = conn.execute(text(*q))
+            else:
+                result = conn.execute(*q)
             print(result)
             conn.close()
         return result

@@ -48,7 +48,8 @@ def get_engine(database):
     '''
     Returns a connection engine from SQLAlchemy
     '''
-    return create_engine(connection_string(database))
+    # echo and echo_pool enable direct logging
+    return create_engine(connection_string(database), echo=True, echo_pool="debug")
 
 def query(q, database = 'hurricane_live', write = False):
     '''
@@ -63,6 +64,6 @@ def query(q, database = 'hurricane_live', write = False):
             else:
                 result = conn.execute(*q)
             print(result)
-            conn.close()
+            conn.commit()
         return result
     return pd.read_sql(q, get_engine(database))

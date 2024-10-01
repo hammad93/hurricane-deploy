@@ -14,9 +14,40 @@ learning and deep learning methods
 
 Note that the virtualized deployment utilizes the cron script, `0 * * * * python /hurricane-deploy/report.py >> /var/log/cron.log 2>&1`, to generate reports.
 
+Useful Docker commands,
+`docker container ls`: Lists the containers that are running
+`docker exec -it [NAME] bash`: Executes a bash terminal on a running container
+
+# Database
+
+Install PostgreSQL
+- https://web.archive.org/web/20240924180833/https://ubuntu.com/server/docs/install-and-configure-postgresql
+
+Include this to the /etc/postgresql/*/pg_hba.conf file,
+
+```
+# all access to all databases for users with an encrypted pass
+host  all  all 0.0.0.0/0 scram-sha-256
+```
+
+Create the database,
+`sudo -u postgres psql`
+
+```sql
+create database hurricane_live;
+\c hurricane_live;
+```
+
+Create the live storm database,
+https://gist.github.com/hammad93/2c9325aec16a03c9d6a9e17778040a07
+
+Create the archive ingest database,
+https://gist.github.com/hammad93/c22b484c120f5c605a516647a6b01f6b
+
+
 ## Credentials
 
-The credentials in CSV format need to be in the directory named `credentials.csv`
+The credentials in CSV format need to be in the `docker` directory with a filename `credentials.csv`
 
 ## Import most recent Atlantic tropical storms
 

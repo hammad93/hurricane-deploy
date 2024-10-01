@@ -5,3 +5,4 @@ pymysql
 openai
 redis
 boto3
+psycopg2

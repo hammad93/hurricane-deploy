@@ -355,7 +355,7 @@ def upload_hash(data) :
     '''
     hashx = data_to_hash(data)
     results = db.query(
-        f'select hash from ingest_hash where hash = '{hashx}''
+        f"select hash from ingest_hash where hash = '{hashx}'"
         )
     if len(results) < 1 : # sqlalchemy 1.4.39
         engine = db.get_engine('hurricane_live')

@@ -13,6 +13,7 @@ import os
 import utils
 import test
 import wp
+import sys
 
 # Setup logs
 logging.basicConfig(filename='report.log', level=logging.DEBUG)
@@ -47,7 +48,8 @@ data = update.nhc()
 global_data = update.global_pipeline()
 def send_email() :
   # get current forecasts to report
-  current_forecasts = requests.get(config.current_forecasts_api).json()
+  #current_forecasts = requests.get(config.current_forecasts_api).json()
+  current_forecasts = 'Disabled forecasts for renovations'
   BODY_HTML = """<html>
   <head></head>
   <body>
@@ -155,8 +157,9 @@ def send_email() :
   
   return BODY_HTML
 
-if global_data['unique'] :
-  test.ai_pipeline()
+command_line = False if len(sys.argv) < 1 else sys.argv[1] # e.g. python report.py push
+if global_data['unique'] or command_line == 'push': # command line to push the email even if not new
+  #test.ai_pipeline()
   BODY_HTML = send_email()
   top_of_the_hour = datetime.datetime.now().replace(minute=0, second=0, microsecond=0).strftime("%Y-%m-%d %H")
   wp.create_post(

@@ -157,7 +157,7 @@ def send_email() :
   
   return BODY_HTML
 
-command_line = False if len(sys.argv) < 1 else sys.argv[1] # e.g. python report.py push
+command_line = False if len(sys.argv) < 2 else sys.argv[1] # e.g. python report.py push
 if global_data['unique'] or command_line == 'push': # command line to push the email even if not new
   #test.ai_pipeline()
   BODY_HTML = send_email()

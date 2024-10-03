@@ -14,9 +14,12 @@ learning and deep learning methods
 
 Note that the virtualized deployment utilizes the cron script, `0 * * * * python /hurricane-deploy/report.py >> /var/log/cron.log 2>&1`, to generate reports.
 
+# Tips & Tricks
+Make sure there is enough swap space for the RAM. You can check with `free -m`
+
 Useful Docker commands,
-`docker container ls`: Lists the containers that are running
-`docker exec -it [NAME] bash`: Executes a bash terminal on a running container
+- `docker container ls`: Lists the containers that are running
+- `docker exec -it [NAME] bash`: Executes a bash terminal on a running container
 
 # Database
 

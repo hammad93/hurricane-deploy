@@ -12,6 +12,7 @@ import os
 import redis
 import test
 import json
+import gc
 
 app = FastAPI(
     title="fluids API",
@@ -51,6 +52,7 @@ async def get_live_storms() -> List[StormData]:
         list: A list of dictionaries containing the current live tropical storms
               with keys: id, time, lat, lon, and int.
     """
+    gc.collect()
     data = db.query("SELECT * FROM hurricane_live")
     data['time'] = data['time'].astype(str)  # Convert 'time' column to string
     data = data.rename(columns={'int': 'wind_speed'})  # Rename 'int' column to 'wind_speed'
@@ -61,7 +63,7 @@ async def get_live_storms() -> List[StormData]:
         storm['wind_speed_kph'] = int(storm['wind_speed']) * 1.852
     return storms
 
-@app.get("/forecast-live-storms")
+#@app.get("/forecast-live-storms")
 def forecast_live_storms(model='all'):
     """
     Get a weather storm forecast using different versions of OpenAI's GPT models.
@@ -130,7 +132,7 @@ def forecasts():
     result = r.get('forecasts')
     return json.loads(result)
 
-@app.get('/latest-tts', response_model=list)
+#@app.get('/latest-tts', response_model=list)
 def latest_tts():
     """
     Retrieve the latest text-to-speech (TTS) output.
@@ -162,7 +164,7 @@ def latest_tts():
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="Error decoding JSON data from Redis")
 
-@app.get('/get-audio/{filename}', response_class=Response)
+#@app.get('/get-audio/{filename}', response_class=Response)
 def get_audio(filename: str):
     """
     Retrieve an audio file in .wav format.

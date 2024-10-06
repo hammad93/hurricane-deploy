@@ -378,9 +378,9 @@ def upload_hash(data) :
 def global_pipeline() :
     data = update_global()
     # generate data
-    hurricane_rows = data[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates().to_dict('records')
+    hurricanes = data[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates().to_dict('records')
     # check if data is unique
-    hashx = upload_hash(hurricane_rows)
+    hashx = upload_hash(hurricanes)
     print(f'data hash: {hashx["hash"]}')
     if hashx['unique'] :
         # create table parameters
@@ -390,12 +390,12 @@ def global_pipeline() :
         table = metadata.tables['hurricane_live']
         # process the data into the live database
         data['hash'] = hashx['hash']
-        upload_data = data[['id', 'time', 'lat', 'lon', 'int', 'hash', 'trans_time', 'source']].to_dict('records')
+        hurricanes = data[['id', 'time', 'lat', 'lon', 'int', 'hash', 'trans_time', 'source']].to_dict('records')
         # reset live table
         db.query(q = ('DELETE FROM hurricane_live',), write = True)
-        db.query(q = (table.insert(), upload_data), write = True)
+        db.query(q = (table.insert(), hurricanes), write = True)
     return {
-        'dataframe' : pd.DataFrame(hurricane_rows),
+        'dataframe' : hurricanes,
         'hash' : hashx['hash'],
         'unique' : hashx['unique']
     }

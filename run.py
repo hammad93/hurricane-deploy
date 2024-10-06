@@ -33,18 +33,8 @@ r = db.redis_client()
 def read_root():
     return {"Hello": "World"}
 
-
-class StormData(BaseModel):
-    id: str = Field(..., description="Storm ID")
-    time: str = Field(..., description="ISO8601 timestamp")
-    lat: float = Field(..., description="Latitude in decimal degrees")
-    lon: float = Field(..., description="Longitude in decimal degrees")
-    wind_speed: int = Field(..., description="Maximum sustained wind speed in knots")
-    wind_speed_mph: float = Field(..., description="Maximum sustained wind speed in miles per hour")
-    wind_speed_kph: float = Field(..., description="Maximum sustained wind speed in kilometers per hour")
-
-@app.get("/live-storms", response_model=List[StormData])
-async def get_live_storms() -> List[StormData]:
+@app.get("/live-storms")
+async def get_live_storms():
     """
     Retrieve live tropical storm data.
 
@@ -59,8 +49,8 @@ async def get_live_storms() -> List[StormData]:
     storms = data.to_dict(orient="records")
     for storm in storms:
         # wind speed is in knots
-        storm['wind_speed_mph'] = int(storm['wind_speed']) * 1.15078
-        storm['wind_speed_kph'] = int(storm['wind_speed']) * 1.852
+        storm['wind_speed_mph'] = round(int(storm['wind_speed']) * 1.15078, 2)
+        storm['wind_speed_kmph'] = round(int(storm['wind_speed']) * 1.852, 2)
     return storms
 
 #@app.get("/forecast-live-storms")

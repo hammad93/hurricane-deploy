@@ -253,10 +253,9 @@ def update_global_hwrf():
     # rename columns to match data structure
     postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
     postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
-    # include data source in storm id
     postprocessed_data['source'] = f"HWRF emc.ncep.noaa.gov"
-    postprocessed_data['trans_time'] = datetime.now().timestamp()
-    postprocessed_data['time'] = [timestamp.timestamp() for timestamp in postprocessed_data['time']]
+    postprocessed_data['trans_time'] = datetime.now().isoformat()
+    postprocessed_data['time'] = [timestamp.isoformat() for timestamp in postprocessed_data['time']]
     return postprocessed_data
 def update_global_rammb():
     '''
@@ -379,19 +378,22 @@ def upload_hash(data) :
 def global_pipeline() :
     data = update_global()
     # generate data
-    hurricane_rows = data[['id', 'time', 'lat', 'lon', 'int']].to_dict('records')
+    hurricane_rows = data[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates().to_dict('records')
     # check if data is unique
     hashx = upload_hash(hurricane_rows)
     print(f'data hash: {hashx["hash"]}')
     if hashx['unique'] :
-        # process the data into the live database
+        # create table parameters
         engine = db.get_engine('hurricane_live')
         metadata = MetaData()
         metadata.reflect(bind=engine)
         table = metadata.tables['hurricane_live']
+        # process the data into the live database
+        data['hash'] = hashx['hash']
+        upload_data = data[['id', 'time', 'lat', 'lon', 'int', 'hash', 'trans_time', 'source']].to_dict('records')
         # reset live table
         db.query(q = ('DELETE FROM hurricane_live',), write = True)
-        db.query(q = (table.insert(), hurricane_rows), write = True)
+        db.query(q = (table.insert(), upload_data), write = True)
     return {
         'dataframe' : pd.DataFrame(hurricane_rows),
         'hash' : hashx['hash'],

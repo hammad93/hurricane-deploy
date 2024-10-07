@@ -31,16 +31,14 @@ app.add_middleware(
 #r = db.redis_client()
 
 @app.get("/")
-async def read_root(request: Request):
-    # Extract query parameters from the original request
-    params = request.query_params
+async def read_root():
 
     # Make a request to the localhost:7000 with the same parameters
     async with httpx.AsyncClient() as client:
-        response = await client.get("http://localhost:8000", params=params)
+        response = await client.get("http://localhost:8000")
 
     # Return the response from the localhost:7000 service
-    return response
+    return response.content
 
 @app.get("/live-storms")
 async def get_live_storms():

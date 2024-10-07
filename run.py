@@ -1,6 +1,6 @@
 from typing import Union, List
 import uvicorn
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import config
@@ -12,6 +12,7 @@ import os
 import redis
 import test
 import json
+import httpx
 import gc
 
 app = FastAPI(
@@ -30,8 +31,16 @@ app.add_middleware(
 #r = db.redis_client()
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+async def read_root(request: Request):
+    # Extract query parameters from the original request
+    params = request.query_params
+
+    # Make a request to the localhost:7000 with the same parameters
+    async with httpx.AsyncClient() as client:
+        response = await client.get("http://localhost:8000", params=params)
+
+    # Return the response from the localhost:7000 service
+    return response
 
 @app.get("/live-storms")
 async def get_live_storms():

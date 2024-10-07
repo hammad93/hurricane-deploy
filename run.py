@@ -185,4 +185,4 @@ def get_audio(filename: str):
 if __name__ == "__main__":
     # set things up according to tests
     test.setup()
-    uvicorn.run("run:app", host="0.0.0.0", port=1337, workers=1, limit_concurrency=1, limit_max_requests=1)
+    uvicorn.run("run:app", host="0.0.0.0", port=1337, workers=1)

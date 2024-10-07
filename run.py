@@ -38,7 +38,7 @@ async def read_root():
         response = await client.get("http://localhost:8000")
 
     # Return the response from the localhost:7000 service
-    return response.content
+    return Response(content=response.text, media_type="text/html")
 
 @app.get("/live-storms")
 async def get_live_storms():

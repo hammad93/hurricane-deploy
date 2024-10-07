@@ -27,7 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-r = db.redis_client()
+#r = db.redis_client()
 
 @app.get("/")
 def read_root():
@@ -52,7 +52,15 @@ async def get_live_storms():
         storm['wind_speed_mph'] = round(int(storm['wind_speed']) * 1.15078, 2)
         storm['wind_speed_kmph'] = round(int(storm['wind_speed']) * 1.852, 2)
     return storms
-
+@app.get('/forecasts')
+def forecasts():
+    '''
+    Provides the last generated forecast in the cache.
+    '''
+    #global r
+    #result = r.get('forecasts')
+    #return json.loads(result)
+    return False
 #@app.get("/forecast-live-storms")
 def forecast_live_storms(model='all'):
     """
@@ -111,16 +119,6 @@ def forecast_live_storms(model='all'):
     global r
     r.set('forecasts', json.dumps(forecast))
     return json.loads(r.get('forecasts'))
-
-
-@app.get('/forecasts')
-def forecasts():
-    '''
-    Provides the last generated forecast in the cache.
-    '''
-    global r
-    result = r.get('forecasts')
-    return json.loads(result)
 
 #@app.get('/latest-tts', response_model=list)
 def latest_tts():
@@ -187,4 +185,4 @@ def get_audio(filename: str):
 if __name__ == "__main__":
     # set things up according to tests
     test.setup()
-    uvicorn.run("run:app", host="0.0.0.0", port=1337, reload=True)
+    uvicorn.run("run:app", host="0.0.0.0", port=1337, limit_concurrency=1, limit_max_requests=1)

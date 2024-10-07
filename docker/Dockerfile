@@ -3,6 +3,8 @@ FROM continuumio/anaconda3
 # SMTP credentials
 
 COPY credentials.csv /root/
+COPY /etc/letsencrypt/live/nfc.ai/fullchain.pem /root/
+COPY /etc/letsencrypt/live/nfc.ai/privkey.pem /root/
 
 # Python additional requirements
 COPY requirements.txt /root/

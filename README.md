@@ -3,7 +3,7 @@ The deployment repository for a hurricane forecasting system based on machine
 learning and deep learning methods
 
 # API Link
-## http://nfc.ai:1337/docs
+## https://nfc.ai:1337/docs
 
 # Quickstart
   - A **credentials.csv** is required for authentication of the SMTP server to send emails. This is stored in a secret gist.

@@ -73,14 +73,14 @@ async def get_live_storms():
         storm['wind_speed_kmph'] = round(int(storm['wind_speed']) * 1.852, 2)
     return storms
 @app.get('/forecasts')
-def forecasts():
+async def forecasts():
     '''
     Provides the last generated forecast in the cache.
     '''
     #global r
     #result = r.get('forecasts')
     #return json.loads(result)
-    data = pd.DataFrame(get_live_storms())
+    data = pd.DataFrame(await get_live_storms())
     forecasts = {}
     for storm in set(data['id']):
         entries = data[data['id'] == storm]

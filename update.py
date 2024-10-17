@@ -8,7 +8,6 @@ Wind Intensity: Knots
 """
 
 from curses import meta
-from distutils.command.upload import upload
 import xmltodict
 import requests
 from datetime import datetime

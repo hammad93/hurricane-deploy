@@ -6,3 +6,4 @@ redis
 boto3
 psycopg2-binary
 httpx
+sqlalchemy

@@ -14,6 +14,7 @@ import test
 import json
 import httpx
 import gc
+import predict
 
 app = FastAPI(
     title="fluids API",
@@ -79,7 +80,16 @@ def forecasts():
     #global r
     #result = r.get('forecasts')
     #return json.loads(result)
-    return False
+    data = pd.DataFrame(get_live_storms())
+    forecasts = {}
+    for storm in set(data['id']):
+        entries = data[data['id'] == storm]
+        entries['time'] = pd.to_datetime(entries['time'])
+        sorted_entries = entries.sort_values(by='time')
+        forecast = predict.forecast_storm_with_great_circle(sorted_entries.to_dict(orient='records'))
+        forecasts[storm] = forecast
+
+    return forecasts
 #@app.get("/forecast-live-storms")
 def forecast_live_storms(model='all'):
     """

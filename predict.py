@@ -8,6 +8,11 @@ import json
 from datetime import timedelta
 from datetime import timezone
 import config
+from math import radians, cos, sin, asin, sqrt, atan2, degrees
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import numpy as np
+from datetime import timedelta
 
 def download_file(url) :
     response = requests.get(url)
@@ -250,3 +255,134 @@ def predict_singular(data = None) :
         print(f'Done with {storm["id"]}, results:\n{output}')
 
     return results
+
+def haversine(lat1, lon1, lat2, lon2):
+    """
+    Calculate the great-circle distance between two points on the Earth using the Haversine formula.
+    """
+    # Radius of the Earth in kilometers
+    R = 6371.0
+    
+    # Convert latitude and longitude from degrees to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    
+    # Compute differences
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    # Haversine formula to calculate the distance
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    
+    # Distance in kilometers
+    distance = R * c
+    return distance
+
+def destination_point(lat, lon, bearing, distance):
+    """
+    Calculate a new point given an initial point, a bearing, and a distance.
+    """
+    R = 6371.0  # Radius of the Earth in kilometers
+    
+    # Convert lat, lon, and bearing to radians
+    lat = radians(lat)
+    lon = radians(lon)
+    bearing = radians(bearing)
+    
+    # Calculate the new latitude
+    new_lat = asin(sin(lat) * cos(distance / R) + cos(lat) * sin(distance / R) * cos(bearing))
+    
+    # Calculate the new longitude
+    new_lon = lon + atan2(sin(bearing) * sin(distance / R) * cos(lat), cos(distance / R) - sin(lat) * sin(new_lat))
+    
+    # Convert the new latitude and longitude back to degrees
+    new_lat = degrees(new_lat)
+    new_lon = degrees(new_lon)
+    
+    return new_lat, new_lon
+
+def bearing(lat1, lon1, lat2, lon2):
+    """
+    Calculate the bearing from point A (lat1, lon1) to point B (lat2, lon2).
+    """
+    # Convert latitudes and longitudes to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    
+    # Calculate the bearing
+    dlon = lon2 - lon1
+    y = sin(dlon) * cos(lat2)
+    x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
+    
+    # Convert the bearing to degrees
+    initial_bearing = atan2(y, x)
+    initial_bearing = degrees(initial_bearing)
+    
+    # Normalize to 0-360 degrees
+    compass_bearing = (initial_bearing + 360) % 360
+    return compass_bearing
+
+def forecast_storm_with_great_circle(data):
+    """
+    Takes in a list of dictionaries representing storm data, and returns a forecast for 1, 2, and 3 days out,
+    incorporating great-circle calculations for latitude and longitude.
+    """
+    # Convert the data to a pandas DataFrame
+    df = pd.DataFrame(data)
+    
+    # Convert 'time' column to datetime
+    df['time'] = pd.to_datetime(df['time'])
+    
+    # Ensure lat/lon and wind_speed are floats
+    df['lat'] = df['lat'].astype(float)
+    df['lon'] = df['lon'].astype(float)
+    df['wind_speed'] = df['wind_speed'].astype(float)
+    
+    # Sort by time
+    df = df.sort_values(by='time')
+    
+    # Extract the most recent and second-most recent data
+    recent_data = df.iloc[-1]
+    previous_data = df.iloc[-2]
+    
+    # Prepare time values in seconds
+    time_values = np.array([(previous_data['time'] - df['time'].min()).total_seconds(), 
+                            (recent_data['time'] - df['time'].min()).total_seconds()]).reshape(-1, 1)
+    
+    # Calculate the great-circle distance and bearing between the two points
+    distance = haversine(previous_data['lat'], previous_data['lon'], recent_data['lat'], recent_data['lon'])
+    angle = bearing(previous_data['lat'], previous_data['lon'], recent_data['lat'], recent_data['lon'])
+    
+    # Create a linear model for distance over time
+    distance_values = np.array([0, distance])  # Start with 0 distance at the earlier point
+    distance_model = LinearRegression().fit(time_values, distance_values)
+    
+    # Create a linear model for wind_speed over time
+    wind_speed_values = np.array([previous_data['wind_speed'], recent_data['wind_speed']], dtype=float)
+    wind_model = LinearRegression().fit(time_values, wind_speed_values)
+    
+    # Define the forecast times: 1 day, 2 days, and 3 days out (in seconds)
+    forecast_times = [
+        (recent_data['time'] + timedelta(days=1) - df['time'].min()).total_seconds(),
+        (recent_data['time'] + timedelta(days=2) - df['time'].min()).total_seconds(),
+        (recent_data['time'] + timedelta(days=3) - df['time'].min()).total_seconds()
+    ]
+    
+    # Calculate the forecasts
+    forecasts = []
+    for t in forecast_times:
+        # Predict the distance and wind speed at each forecast time
+        predicted_distance = distance_model.predict([[t]])[0]
+        wind_speed_forecast = wind_model.predict([[t]])[0]
+        
+        # Use the distance and bearing to calculate the new lat/lon
+        forecast_lat, forecast_lon = destination_point(recent_data['lat'], recent_data['lon'], angle, predicted_distance)
+        
+        forecast = {
+            'forecast_time': df['time'].min() + timedelta(seconds=t),
+            'lat': forecast_lat,
+            'lon': forecast_lon,
+            'wind_speed': wind_speed_forecast
+        }
+        forecasts.append(forecast)
+    
+    return forecasts

@@ -361,7 +361,9 @@ def forecast_storm_with_great_circle(data):
     wind_model = LinearRegression().fit(time_values, wind_speed_values)
     
     # Define the forecast times: 1 day, 2 days, and 3 days out (in seconds)
-    forecast_times = [
+    forecast_times = 
+        (recent_data['time'] + timedelta(hours=6) - df['time'].min()).total_seconds(),
+        (recent_data['time'] + timedelta(hours=12) - df['time'].min()).total_seconds(),
         (recent_data['time'] + timedelta(days=1) - df['time'].min()).total_seconds(),
         (recent_data['time'] + timedelta(days=2) - df['time'].min()).total_seconds(),
         (recent_data['time'] + timedelta(days=3) - df['time'].min()).total_seconds()

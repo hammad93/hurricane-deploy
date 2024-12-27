@@ -48,6 +48,8 @@ https://gist.github.com/hammad93/2c9325aec16a03c9d6a9e17778040a07
 Create the archive ingest database,
 https://gist.github.com/hammad93/c22b484c120f5c605a516647a6b01f6b
 
+Remember to allow the port through the firewall.
+`sudo ufw allow 5432`
 
 ## Credentials
 

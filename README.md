@@ -11,7 +11,8 @@ learning and deep learning methods
 
 1. Navigate to the `docker` directory in this repository
 2. Run the docker command, `sudo docker build --no-cache -t hurricane .` to install the deployment using docker
-3. Run the docker command, `sudo docker run -d -p 1337:1337 --network=host hurricane` to activate software that will run email reports every hour
+3. Run the docker command, `sudo docker run -d -p 1337:1337 hurricane` to activate software that will run email reports every hour
+   - During troubleshooting, we can also use `--network=host` instead of ports, `-p`, but this can easily lead to multiple applications running on the same port 
 
 Note that the virtualized deployment utilizes the cron script, `0 * * * * python /hurricane-deploy/report.py >> /var/log/cron.log 2>&1`, to generate reports.
 

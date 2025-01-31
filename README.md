@@ -7,7 +7,7 @@ learning and deep learning methods
 
 # Quickstart
   - A **credentials.csv** is required for authentication of the SMTP server to send emails. This is stored in a secret gist.
-  - Copy the SSL certificates over to the docker directory
+  - Copy the SSL certificates over to the docker directory for HTTPS
 
 1. Navigate to the `docker` directory in this repository
 2. Run the docker command, `sudo docker build --no-cache -t hurricane .` to install the deployment using docker
@@ -16,11 +16,16 @@ learning and deep learning methods
 Note that the virtualized deployment utilizes the cron script, `0 * * * * python /hurricane-deploy/report.py >> /var/log/cron.log 2>&1`, to generate reports.
 
 # Tips & Tricks
-Make sure there is enough swap space for the RAM. You can check with `free -m`
 
-Useful Docker commands,
-- `docker container ls`: Lists the containers that are running
+- Make sure there is enough swap space for the RAM. You can check with `free -m`
+- To get HTTPS, use https://certbot.eff.org/
+  - The command is `sudo certbot certonly --standalone`
+
+## Useful Docker commands,
+- `docker container ls`: Lists the containers that are running. There's also `sudo docker ps` but the __container__ keyword has more features.
 - `docker exec -it [NAME] bash`: Executes a bash terminal on a running container
+- `docker container stats`: Shows the memory usage of the running containers
+- `docker volume ls`: Lists where containers share files on the host machine
 
 # Database
 

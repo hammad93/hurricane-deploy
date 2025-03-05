@@ -176,6 +176,7 @@ def nhc() :
             results.append(storm)
 
     return results
+
 def update_global_hwrf():
     '''
     Provides data based on current global storms based on the HWRF data
@@ -230,6 +231,7 @@ def update_global_hwrf():
     active_storms = active_storms.dropna(axis=1, how='all')
     # change data types of columns
     active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in active_storms['time']]
+    
     def process_coord(c):
         '''
         The coordinates in the files are in a different 
@@ -242,12 +244,14 @@ def update_global_hwrf():
         value = float(c[:-1]) / 10
         direction = c[-1:]
         return value if direction in ['N', 'E'] else -value
+    
     active_storms['lat'] = [process_coord(c) for c in active_storms['lat']]
     active_storms['lon'] = [process_coord(c) for c in active_storms['lon']]
     active_storms['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
         active_storms['basin'],
         active_storms['id'],
         active_storms['time'])]
+    
     # drop duplicates that might have some extra data
     postprocessed_data = active_storms.drop_duplicates(
         subset=['basin', 'id', 'time', 'model', 'lead_time', 'lat', 'lon', 'wind', 'pressure'])
@@ -255,9 +259,10 @@ def update_global_hwrf():
     postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
     postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
     postprocessed_data['source'] = f"HWRF emc.ncep.noaa.gov"
-    postprocessed_data['trans_time'] = datetime.now().isoformat()
+    postprocessed_data['trans_time'] = datetime.now().isoformat() # transfer time
     postprocessed_data['time'] = [timestamp.isoformat() for timestamp in postprocessed_data['time']]
     return postprocessed_data
+
 def update_global_rammb():
     '''
     Provides data based on current global storms based on the RAMMB data
@@ -377,6 +382,9 @@ def upload_hash(data) :
     }
 
 def global_pipeline() :
+    '''
+    Here, we run the webscraper for the live tropical storm data and do some post processing.
+    '''
     data = update_global()
     # generate data
     hurricanes = data[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates()
@@ -412,11 +420,29 @@ def live_deltas():
         row['data']
     return df
 
-def update_hfsa():
+def update_global_hfsa():
     '''
+    Provides data based on current global storms based on the HFSA data
+
+    Returns
+    -------
+    array of dict
+        Each dictionary is in the following form,
+        {
+            "id" : string,
+        }
     '''
     # request the list of current tropical storms
-    request.get(config.hfsa_url)
+    request = requests.get(config.hfsa_url)
+
+    # parse current tropical storms
+    content = request.content.decode('utf8')
+    actstorm_match = re.search(r'var actstorm\s*=\s*({.*?});', content, re.DOTALL)
+    actstorm = json.loads(actstorm_match.group(1))
+    actcycle_match = re.search(r'var actcycle\s*=\s*({.*?});', content, re.DOTALL)
+    actcycle = json.loads(actcycle_match.group(1))
+
+        
 
 if __name__ == "__main__" :
     update_global()

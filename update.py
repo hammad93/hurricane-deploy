@@ -434,8 +434,9 @@ def update_global_hfsa():
     '''
     # request the HFSA data through web url
     request = requests.get(config.hfsa_url)
+    content = request.content.decode('utf8')
 
-    # parse current tropical storms
+    # begin parsing current tropical storms
     # extract variables using regular expressions
     actstorm = json.loads(re.search(r'var actstorm\s*=\s*({.*?});', content, re.DOTALL).group(1))
     actcycle = json.loads(re.search(r'var actcycle\s*=\s*({.*?});', content, re.DOTALL).group(1))
@@ -462,6 +463,7 @@ def update_global_hfsa():
     # drill down and request the raw data for each tropical storm
     raw_data = [{'url': url, 'content': requests.get(url).content} for url in urls]
     
+    return raw_data
 
 if __name__ == "__main__" :
     update_global()

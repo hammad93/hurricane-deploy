@@ -22,6 +22,8 @@ import db
 import sqlalchemy
 from sqlalchemy import MetaData, Table
 import json
+import re
+import config
 
 def past_track(link):
     '''
@@ -410,6 +412,11 @@ def live_deltas():
         row['data']
     return df
 
+def update_hfsa():
+    '''
+    '''
+    # request the list of current tropical storms
+    request.get(config.hfsa_url)
 
 if __name__ == "__main__" :
     update_global()

@@ -432,17 +432,36 @@ def update_global_hfsa():
             "id" : string,
         }
     '''
-    # request the list of current tropical storms
+    # request the HFSA data through web url
     request = requests.get(config.hfsa_url)
 
     # parse current tropical storms
-    content = request.content.decode('utf8')
-    actstorm_match = re.search(r'var actstorm\s*=\s*({.*?});', content, re.DOTALL)
-    actstorm = json.loads(actstorm_match.group(1))
-    actcycle_match = re.search(r'var actcycle\s*=\s*({.*?});', content, re.DOTALL)
-    actcycle = json.loads(actcycle_match.group(1))
+    # extract variables using regular expressions
+    actstorm = json.loads(re.search(r'var actstorm\s*=\s*({.*?});', content, re.DOTALL).group(1))
+    actcycle = json.loads(re.search(r'var actcycle\s*=\s*({.*?});', content, re.DOTALL).group(1))
+    basins = json.loads(re.search(r'var basins\s*=\s*(\[.*?\]);', content, re.DOTALL).group(1))
 
-        
+    # generate URLs based on the JavaScript logic
+    urls = []
+    for basin_idx, basin in enumerate(basins):
+        key = str(basin_idx)
+        if key in actstorm and key in actcycle:
+            for storm, cycle in zip(actstorm[key], actcycle[key]):
+                # Extract components from storm/cycle names
+                sId_part = storm[-3:].lower()  # Last 3 chars of storm name, lowercase
+                acycle_part = cycle.split('.')[1]  # Get the date portion
+                
+                # Construct URL components
+                datadir = f"https://www.emc.ncep.noaa.gov/{basin['reldir']}"
+                filename = f"{sId_part}.{acycle_part}.hfsa.trak.atcfunix"
+                
+                # Full URL path
+                full_url = f"{datadir}/{storm}/{cycle}/{filename}"
+                urls.append(full_url)
+    
+    # drill down and request the raw data for each tropical storm
+    raw_data = [{'url': url, 'content': requests.get(url).content} for url in urls]
+    
 
 if __name__ == "__main__" :
     update_global()

@@ -23,7 +23,6 @@ import sqlalchemy
 from sqlalchemy import MetaData, Table
 import json
 import re
-import config
 
 def past_track(link):
     '''
@@ -177,6 +176,19 @@ def nhc() :
 
     return results
 
+def process_coord(c):
+    '''
+    The coordinates in the files are in a different 
+    coordinate format like 262N. The data description
+    claims that we can divide by 10 and get the 
+    decimal representation. This function tries to output
+    in decimal degrees. A positive value for North and East,
+    a negative value for South and West. 
+    '''
+    value = float(c[:-1]) / 10
+    direction = c[-1:]
+    return value if direction in ['N', 'E'] else -value
+
 def update_global_hwrf():
     '''
     Provides data based on current global storms based on the HWRF data
@@ -230,21 +242,7 @@ def update_global_hwrf():
     # trim buffered columns
     active_storms = active_storms.dropna(axis=1, how='all')
     # change data types of columns
-    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in active_storms['time']]
-    
-    def process_coord(c):
-        '''
-        The coordinates in the files are in a different 
-        coordinate format like 262N. The data description
-        claims that we can divide by 10 and get the 
-        decimal representation. This function tries to output
-        in decimal degrees. A positive value for North and East,
-        a negative value for South and West. 
-        '''
-        value = float(c[:-1]) / 10
-        direction = c[-1:]
-        return value if direction in ['N', 'E'] else -value
-    
+    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in active_storms['time']]    
     active_storms['lat'] = [process_coord(c) for c in active_storms['lat']]
     active_storms['lon'] = [process_coord(c) for c in active_storms['lon']]
     active_storms['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
@@ -422,18 +420,31 @@ def live_deltas():
 
 def update_global_hfsa():
     '''
-    Provides data based on current global storms based on the HFSA data
+    Provides data based on current global storms based on the HFSA data.
+    The code is based on the update_global_hwrf() function.
+
+    References
+    ----------
+    https://www.emc.ncep.noaa.gov/hurricane/HFSA/index.php
 
     Returns
     -------
-    array of dict
-        Each dictionary is in the following form,
-        {
-            "id" : string,
-        }
+    df
+        Columns are ['basin', 'id', 'time', 'model', 'lead_time', 'lat', 'lon', 'int', 'pressure']
     '''
+    config = {
+        'url': 'https://www.emc.ncep.noaa.gov/hurricane/HFSA/index.php',
+        'source': 'HFSA emc.ncep.noaa.gov',
+        'column_names': ['basin', 'id', 'time', 'is_f', 'model', 'lead_time',
+                        'lat', 'lon', 'wind', 'pressure', 'label', 'radii_threshold', 'radii_begin',
+                        'wind_radii_1', 'wind_radii_2', 'wind_radii_3', 'wind_radii_4', 'isobar_pressure',
+                        'isobar_radius', 'max_wind_radius', 'var_1', 'var_2', 'var_3', 'var_4', 'var_5', 
+                        'var_6', 'var_7', 'name', 'var_8'],
+        'main_columns': ['basin', 'id', 'time', 'model', 'lead_time', 'lat', 'lon', 'wind', 'pressure'],
+        'column_buffer': 22,
+    }
     # request the HFSA data through web url
-    request = requests.get(config.hfsa_url)
+    request = requests.get(config['url'])
     content = request.content.decode('utf8')
 
     # begin parsing current tropical storms
@@ -461,9 +472,33 @@ def update_global_hfsa():
                 urls.append(full_url)
     
     # drill down and request the raw data for each tropical storm
-    raw_data = [{'url': url, 'content': requests.get(url).content} for url in urls]
-    
-    return raw_data
+    dfs = []
+    for url in urls:
+        data = pd.read_csv(url, names = config['column_names'] + [f'unk_{i}' for i in range(config['column_buffer'])])
+        # process data into standard data structures
+        print(data)
+        data['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in data['time']]
+        data['lat'] = [process_coord(c) for c in data['lat']]
+        data['lon'] = [process_coord(c) for c in data['lon']]
+        data['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
+            data['basin'],
+            data['id'],
+            data['time'])
+        ]
+        # drop duplicates that might have some extra data
+        postprocessed_data = data.drop_duplicates(
+            subset=config['main_columns']
+        )
+        # rename columns to match data structure
+        postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
+        postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
+        postprocessed_data['source'] = config['source']
+        postprocessed_data['trans_time'] = datetime.now().isoformat() # transfer time
+        postprocessed_data['time'] = [timestamp.isoformat() for timestamp in postprocessed_data['time']] # process back to string
+
+        dfs.append(data)
+
+    return dfs
 
 if __name__ == "__main__" :
     update_global()

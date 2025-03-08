@@ -341,7 +341,11 @@ def update_global():
     '''
     This function decides which global ingestion to use
     '''
-    return update_global_hwrf()
+    # pull in RAMMB data
+    rammb = update_global_rammb()
+    # pull in NOAA data
+    noaa = update_global_hfsa()
+    return {'RAMMB': rammb, 'NOAA': noaa}
 
 def data_to_hash(data) :
     '''

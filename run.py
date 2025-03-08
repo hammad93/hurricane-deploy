@@ -86,7 +86,6 @@ async def forecasts():
         entries['time'] = pd.to_datetime(entries['time'])
         sorted_entries = entries.sort_values(by='time')
         forecast = predict.forecast_storm_with_great_circle(sorted_entries.to_dict(orient='records'))
-        forecast['source'] = 'Linear Model by fluids'
         forecasts[storm] = forecast
 
     return forecasts

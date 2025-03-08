@@ -383,7 +383,8 @@ def forecast_storm_with_great_circle(data):
             'forecast_time': df['time'].min() + timedelta(seconds=t),
             'lat': forecast_lat,
             'lon': forecast_lon,
-            'wind_speed': wind_speed_forecast
+            'wind_speed': wind_speed_forecast,
+            'source': 'Linear Model by fluids'
         }
         forecasts.append(forecast)
     

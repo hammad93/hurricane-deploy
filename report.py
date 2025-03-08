@@ -26,10 +26,8 @@ RECIPIENTS  = 'hourly@fluids.ai'
 # SMTP Credentials
 credentials_df = pd.read_csv('/root/credentials.csv')
 credentials = credentials_df.iloc[0]
-print(f"SMTP mail credentials: {credentials}")
 USERNAME_SMTP = credentials['user']
 PASSWORD_SMTP = credentials['pass']
-
 
 HOST = credentials['host']
 PORT = int(credentials['port'])

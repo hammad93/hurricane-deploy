@@ -27,3 +27,5 @@ def create_post(title, content, **kwargs):
         print("Post created successfully, ID:", response.json()['id'])
     else:
         print("Failed to create post:", response.content)
+    
+    return response

@@ -23,6 +23,7 @@ Note that the virtualized deployment utilizes the cron script, `0 * * * * python
   - The command is `sudo certbot certonly --standalone`
 
 ## Useful Docker commands,
+- `docker container logs [NAME] --follow`: Get the live logs of a running container
 - `docker container ls`: Lists the containers that are running. There's also `sudo docker ps` but the __container__ keyword has more features.
 - `docker exec -it [NAME] bash`: Executes a bash terminal on a running container
 - `docker container stats`: Shows the memory usage of the running containers

@@ -385,30 +385,52 @@ def upload_hash(data) :
 
 def global_pipeline() :
     '''
-    Here, we run the webscraper for the live tropical storm data and do some post processing.
+    Here, we pull from official data sources for the live tropical storm data
+    and post process according to our existing PostgreSQL databse.
     '''
+    # Download live data from sources described in the functions
     data = update_global()
-    # generate data
-    hurricanes = data[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates()
-    # check if data is unique
-    hashx = upload_hash(hurricanes.to_dict('records'))
-    print(f'data hash: {hashx["hash"]}')
-    if hashx['unique'] :
+    
+    # Post process for the expected row values of the hurricane_live table 
+    # data model is here https://gist.github.com/hammad93/2c9325aec16a03c9d6a9e17778040a07
+    tracks = []
+    for model in data['RAMMB'] :
+        track = pd.DataFrame(model['data']['track_history'])
+        track['id'] = model['id']
+        track['time'] = [dateutil.parser.parse(t).replace(tzinfo=datetime.timezone.utc) for t in track['Synoptic Time']]
+        track['trans_time'] = datetime.datetime.now(datetime.UTC)
+        track['source'] = 'rammb-data.cira.colostate.edu'
+        # track['hash'] this is done at the upload phase from the defined data model
+        track['lat'] = track['Latitude']
+        track['lon'] = track['Longitude']
+        track['int'] = track['Intensity']
+        tracks.append(track)
+
+    live_df = pd.concat(tracks)
+    # present data as it will be archived and vectorized
+    hurricanes = live_df[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates()
+    
+    # Vectorize the data into a cryptographic hash and upload to database
+    vector = upload_hash(hurricanes.to_dict('records'))
+    print(f'hashlib.md5 data: {vector["hash"]}')
+
+    if vector['unique'] :
         # create table parameters
         engine = db.get_engine('hurricane_live')
         metadata = MetaData()
         metadata.reflect(bind=engine)
         table = metadata.tables['hurricane_live']
         # process the data into the live database
-        data['hash'] = hashx['hash']
+        data['hash'] = vector['hash']
         hurricanes = data[['id', 'time', 'lat', 'lon', 'int', 'hash', 'trans_time', 'source']]
         # reset live table
         db.query(q = ('DELETE FROM hurricane_live',), write = True)
         db.query(q = (table.insert(), hurricanes.to_dict('records')), write = True)
+    
     return {
         'dataframe' : hurricanes,
-        'hash' : hashx['hash'],
-        'unique' : hashx['unique']
+        'hash' : vector['hash'],
+        'unique' : vector['unique']
     }
 
 def live_deltas():

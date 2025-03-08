@@ -48,8 +48,7 @@ data = update.nhc()
 global_data = update.global_pipeline()
 def send_email() :
   # get current forecasts to report
-  #current_forecasts = requests.get(config.current_forecasts_api).json()
-  current_forecasts = 'Disabled forecasts for renovations'
+  current_forecasts = requests.get(config.current_forecasts_api).json()
   BODY_HTML = """<html>
   <head></head>
   <body>

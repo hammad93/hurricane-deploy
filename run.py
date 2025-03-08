@@ -72,14 +72,13 @@ async def get_live_storms():
         storm['wind_speed_mph'] = round(int(storm['wind_speed']) * 1.15078, 2)
         storm['wind_speed_kmph'] = round(int(storm['wind_speed']) * 1.852, 2)
     return storms
+
 @app.get('/forecasts')
 async def forecasts():
     '''
-    Provides the last generated forecast in the cache.
+    Generates a linear model that is quick enough to do it in the API call.
+    Reference predict.forecast_storm_with_great_circle
     '''
-    #global r
-    #result = r.get('forecasts')
-    #return json.loads(result)
     data = pd.DataFrame(await get_live_storms())
     forecasts = {}
     for storm in set(data['id']):
@@ -87,6 +86,7 @@ async def forecasts():
         entries['time'] = pd.to_datetime(entries['time'])
         sorted_entries = entries.sort_values(by='time')
         forecast = predict.forecast_storm_with_great_circle(sorted_entries.to_dict(orient='records'))
+        forecast['source'] = 'Linear Model by fluids'
         forecasts[storm] = forecast
 
     return forecasts

@@ -10,7 +10,7 @@ Wind Intensity: Knots
 from curses import meta
 import xmltodict
 import requests
-from datetime import datetime
+import datetime
 import dateutil.parser
 from pytz import timezone
 import zipfile
@@ -53,7 +53,7 @@ def past_track(link):
         if attribute['name'] == 'Data':
             for entry in attribute['Placemark']:
                 # parse time information
-                time = datetime.strptime(entry['atcfdtg'],
+                time = datetime.datetime.strptime(entry['atcfdtg'],
                                         '%Y%m%d%H').replace(
                     tzinfo=timezone('UTC'))
 
@@ -220,7 +220,7 @@ def update_global_hwrf():
     update_table['timestamp'] = [time.timestamp() for time in pd.to_datetime(update_table[config['time_column']], utc=True)]
     # the table has many entries, so we only parse the most recent one
     # according to the frequency. We use the most recent in a day
-    timestamp_threshold = datetime.now().timestamp() - (config['freq'] * 4)
+    timestamp_threshold = datetime.datetime.now().timestamp() - (config['freq'] * 4)
     data = update_table[update_table['timestamp'] > timestamp_threshold]
     # construct links to applicable data
     links = [config['url'] + fname for fname in data['File Name']]
@@ -242,7 +242,7 @@ def update_global_hwrf():
     # trim buffered columns
     active_storms = active_storms.dropna(axis=1, how='all')
     # change data types of columns
-    active_storms['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in active_storms['time']]    
+    active_storms['time'] = [datetime.datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in active_storms['time']]    
     active_storms['lat'] = [process_coord(c) for c in active_storms['lat']]
     active_storms['lon'] = [process_coord(c) for c in active_storms['lon']]
     active_storms['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
@@ -257,7 +257,7 @@ def update_global_hwrf():
     postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
     postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
     postprocessed_data['source'] = f"HWRF emc.ncep.noaa.gov"
-    postprocessed_data['trans_time'] = datetime.now().isoformat() # transfer time
+    postprocessed_data['trans_time'] = datetime.datetime.now().isoformat() # transfer time
     postprocessed_data['time'] = [timestamp.isoformat() for timestamp in postprocessed_data['time']]
     return postprocessed_data
 
@@ -397,8 +397,8 @@ def global_pipeline() :
     for model in data['RAMMB'] :
         track = pd.DataFrame(model['data']['track_history'])
         track['id'] = model['id']
-        track['time'] = [dateutil.parser.parse(t).replace(tzinfo=datetime.timezone.utc) for t in track['Synoptic Time']]
-        track['trans_time'] = datetime.datetime.now(datetime.UTC)
+        track['time'] = [dateutil.parser.parse(t).replace(tzinfo=datetime.UTC) for t in track['Synoptic Time']]
+        track['trans_time'] = datetime.datetime.now().isoformat()
         track['source'] = 'rammb-data.cira.colostate.edu'
         # track['hash'] this is done at the upload phase from the defined data model
         track['lat'] = track['Latitude']

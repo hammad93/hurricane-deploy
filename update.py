@@ -375,7 +375,7 @@ def upload_hash(data) :
         stmnt = table.insert().values(
             hash = hashx,
             data = {"ingest" : data},
-            time = datetime.now().isoformat()
+            time = datetime.datetime.now().isoformat()
         )
         db.query(q = (stmnt,), write = True)
     return {
@@ -397,7 +397,7 @@ def global_pipeline() :
     for model in data['RAMMB'] :
         track = pd.DataFrame(model['data']['track_history'])
         track['id'] = model['id']
-        track['time'] = [dateutil.parser.parse(t).replace(tzinfo=datetime.UTC) for t in track['Synoptic Time']]
+        track['time'] = [dateutil.parser.parse(t).replace(tzinfo=datetime.UTC).isoformat() for t in track['Synoptic Time']]
         track['trans_time'] = datetime.datetime.now().isoformat()
         track['source'] = 'rammb-data.cira.colostate.edu'
         # track['hash'] this is done at the upload phase from the defined data model
@@ -408,7 +408,7 @@ def global_pipeline() :
 
     live_df = pd.concat(tracks)
     # present data as it will be archived and vectorized
-    hurricanes = live_df[['id', 'time', 'lat', 'lon', 'int']].drop_duplicates()
+    hurricanes = live_df[['id', 'time', 'lat', 'lon', 'int', 'source']].drop_duplicates()
     
     # Vectorize the data into a cryptographic hash and upload to database
     vector = upload_hash(hurricanes.to_dict('records'))
@@ -421,8 +421,8 @@ def global_pipeline() :
         metadata.reflect(bind=engine)
         table = metadata.tables['hurricane_live']
         # process the data into the live database
-        data['hash'] = vector['hash']
-        hurricanes = data[['id', 'time', 'lat', 'lon', 'int', 'hash', 'trans_time', 'source']]
+        live_df['hash'] = vector['hash']
+        hurricanes = live_df[['id', 'time', 'lat', 'lon', 'int', 'hash', 'trans_time', 'source']]
         # reset live table
         db.query(q = ('DELETE FROM hurricane_live',), write = True)
         db.query(q = (table.insert(), hurricanes.to_dict('records')), write = True)
@@ -503,10 +503,10 @@ def update_global_hfsa():
         data = pd.read_csv(url, names = config['column_names'] + [f'unk_{i}' for i in range(config['column_buffer'])])
         # process data into standard data structures
         print(data)
-        data['time'] = [datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')) for time in data['time']]
+        data['time'] = [datetime.datetime.strptime(str(time), '%Y%m%d%H').replace(tzinfo=timezone('utc')).isoformat() for time in data['time']]
         data['lat'] = [process_coord(c) for c in data['lat']]
         data['lon'] = [process_coord(c) for c in data['lon']]
-        data['storm_id'] = [f'{ids[0]}{ids[1]}{ids[2].year}' for ids in zip(
+        data['storm_id'] = [f'{ids[0]}{ids[1]}{dateutil.parser.parse(ids[2]).year}' for ids in zip(
             data['basin'],
             data['id'],
             data['time'])
@@ -519,9 +519,7 @@ def update_global_hfsa():
         postprocessed_data = postprocessed_data.rename(columns = {'wind': 'int', 'id': '_id'})
         postprocessed_data = postprocessed_data.rename(columns = {'storm_id': 'id'})
         postprocessed_data['source'] = config['source']
-        postprocessed_data['trans_time'] = datetime.now().isoformat() # transfer time
-        postprocessed_data['time'] = [timestamp.isoformat() for timestamp in postprocessed_data['time']] # process back to string
-
+        postprocessed_data['trans_time'] = datetime.datetime.now().isoformat() # transfer time
         dfs.append(data)
 
     return dfs

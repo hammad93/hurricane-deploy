@@ -21,7 +21,7 @@ logging.basicConfig(filename='report.log', level=logging.DEBUG)
 SENDER = 'husmani@fluids.ai'
 SENDERNAME = 'Hurricane AI'
 
-RECIPIENTS  = 'hammadus@gmail.com;hurricaneaiml@gmail.com'
+RECIPIENTS  = 'hourly@fluids.ai'
 
 # SMTP Credentials
 credentials_df = pd.read_csv('/root/credentials.csv')

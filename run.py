@@ -18,7 +18,7 @@ import predict
 
 app = FastAPI(
     title="fluids API",
-    description="A 100% independent and non-profit weather API providing accurate, global weather data.",
+    description="A 100% independent and non-profit weather API providing weather data.",
     version="1.0.0",
 )
 

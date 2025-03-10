@@ -197,4 +197,4 @@ def chatgpt(prompt, model_version="gpt-3.5-turbo", retries=5, id=None, metadata=
         "json" : json_object,
         "metadata" : version if not metadata else {**metadata, **version}
     }
-#setup()
+setup()

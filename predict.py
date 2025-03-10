@@ -339,6 +339,10 @@ def forecast_storm_with_great_circle(data):
     
     # Sort by time
     df = df.sort_values(by='time')
+
+    # Return empty data if there's only one record
+    if len(df) < 2 :
+        return []
     
     # Extract the most recent and second-most recent data
     recent_data = df.iloc[-1]

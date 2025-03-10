@@ -1,4 +1,4 @@
-# hurricane-deploy
+# hurricane-agent
 The code for the agentic AI is defined in this repository. It can include deployment software which has 
 bundled algorithms for tropical storm forecasting. The deep learning approaches to accomplish this is at
 <a href="https://github.com/hammad93/hurricane-net" target="_blank">hurricane-net</a>
